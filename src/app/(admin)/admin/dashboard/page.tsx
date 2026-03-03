@@ -3,7 +3,7 @@ import Link from "next/link";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
   Car, Receipt, AlertTriangle, Shield,
-  Plus, FileDown, ClipboardList, ArrowRight,
+  Plus, ClipboardList, ArrowRight,
 } from "lucide-react";
 import {
   SpendByCategoryChart,
@@ -185,27 +185,13 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* ── Quick actions ──────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-3 animate-fade-up delay-3">
+      <div className="grid grid-cols-2 gap-3 animate-fade-up delay-3">
         <Link href="/admin/receipts/new">
           <div className="rounded-2xl p-4 flex items-center gap-3 cursor-pointer transition-all bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-sm hover:shadow-indigo group">
             <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
               <Receipt className="h-4 w-4 text-white" />
             </div>
-            <div>
-              <p className="text-sm font-semibold text-white">New Receipt</p>
-              <p className="text-xs text-white/70">Log an expense</p>
-            </div>
-          </div>
-        </Link>
-        <Link href="/admin/exports">
-          <div className="rounded-2xl p-4 flex items-center gap-3 cursor-pointer bg-card border border-border hover:border-[var(--border-hi)] transition-all">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--indigo-dim)" }}>
-              <FileDown className="h-4 w-4" style={{ color: "var(--indigo-soft)" }} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Export</p>
-              <p className="text-xs text-muted-foreground">Excel / QBO</p>
-            </div>
+            <p className="text-sm font-semibold text-white">New Receipt</p>
           </div>
         </Link>
         <Link href="/admin/requests">
@@ -213,10 +199,7 @@ export default async function AdminDashboardPage() {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(124,58,237,0.12)" }}>
               <ClipboardList className="h-4 w-4 text-violet-400" />
             </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Requests</p>
-              <p className="text-xs text-muted-foreground">Review cars</p>
-            </div>
+            <p className="text-sm font-semibold text-foreground">Requests</p>
           </div>
         </Link>
       </div>

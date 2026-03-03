@@ -50,15 +50,15 @@
 /* ── DARK MODE ──────────────────────────────────────── */
 .dark {
   --background:           #080810;
-  --foreground:           #f1f5f9;
+  --foreground:           #f8fafc;
   --card:                 #10101c;
-  --card-foreground:      #f1f5f9;
+  --card-foreground:      #f8fafc;
   --primary:              #6366f1;
   --primary-foreground:   #ffffff;
   --secondary:            #16162a;
-  --secondary-foreground: #f1f5f9;
+  --secondary-foreground: #f8fafc;
   --muted:                #16162a;
-  --muted-foreground:     #94a3b8;
+  --muted-foreground:     #a8b8cc;
   --accent:               #1c1c32;
   --accent-foreground:    #f1f5f9;
   --destructive:          #f43f5e;

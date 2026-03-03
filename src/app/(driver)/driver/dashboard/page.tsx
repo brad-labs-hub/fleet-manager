@@ -1,8 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Receipt, Car, Wrench, AlertTriangle } from "lucide-react";
+import { Receipt, Car, Wrench, AlertTriangle, ArrowRight } from "lucide-react";
 import { formatDate, formatCurrency } from "@/lib/utils";
 
 export default async function DriverDashboardPage() {
@@ -24,116 +22,114 @@ export default async function DriverDashboardPage() {
     .limit(5);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
+    <div className="space-y-5">
 
+      {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
         <Link href="/driver/receipts/new">
-          <Button className="w-full h-24 flex flex-col gap-2" size="lg">
-            <Receipt className="h-6 w-6" />
-            Add Receipt
-          </Button>
-        </Link>
-        <Link href="/driver/vehicles">
-          <Button variant="outline" className="w-full h-24 flex flex-col gap-2" size="lg">
-            <Car className="h-6 w-6" />
-            Vehicles
-          </Button>
+          <div className="rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 h-24 cursor-pointer transition-all bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-sm hover:shadow-indigo">
+            <Receipt className="h-5 w-5 text-white" />
+            <p className="text-sm font-semibold text-white">New Receipt</p>
+          </div>
         </Link>
         <Link href="/driver/requests/new">
-          <Button variant="outline" className="w-full h-24 flex flex-col gap-2 col-span-2" size="lg">
-            <Wrench className="h-6 w-6" />
-            Request a Car
-          </Button>
+          <div className="rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 h-24 cursor-pointer bg-card border border-border hover:border-[var(--border-hi)] transition-all">
+            <Wrench className="h-5 w-5" style={{ color: "var(--indigo-soft)" }} />
+            <p className="text-sm font-semibold text-foreground">Request a Car</p>
+          </div>
         </Link>
       </div>
 
+      {/* Maintenance alerts */}
       {alerts && alerts.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
-              Maintenance Alerts
-            </h2>
-          </CardHeader>
-          <CardContent className="space-y-2">
+        <div className="rounded-2xl bg-card border border-border p-5">
+          <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm mb-3">
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--amber-dim)" }}>
+              <AlertTriangle className="h-3.5 w-3.5" style={{ color: "var(--amber)" }} />
+            </div>
+            Maintenance Alerts
+          </h2>
+          <div className="space-y-1">
             {alerts.map((a) => (
-              <div
-                key={a.id}
-                className="flex justify-between text-sm py-2 border-b border-neutral-100 last:border-0"
-              >
-                <span>
+              <div key={a.id} className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl text-sm border-b border-border last:border-0">
+                <span className="text-foreground text-xs font-medium">
                   {(a.vehicle as unknown as { make: string; model: string })?.make}{" "}
                   {(a.vehicle as unknown as { make: string; model: string })?.model}
                 </span>
-                <span className="text-muted-foreground">
+                <span className="text-xs font-semibold shrink-0" style={{ color: "var(--amber)" }}>
                   {a.due_date ? formatDate(a.due_date) : a.alert_type}
                 </span>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      <Card>
-        <CardHeader className="pb-2">
-          <h2 className="font-semibold">Recent Receipts</h2>
-        </CardHeader>
-        <CardContent>
-          {recentReceipts && recentReceipts.length > 0 ? (
-            <div className="space-y-2">
-              {recentReceipts.map((r) => (
-                <Link
-                  key={r.id}
-                  href={`/driver/receipts/${r.id}`}
-                  className="flex justify-between text-sm py-2 border-b border-neutral-100 last:border-0 hover:bg-neutral-50 -mx-2 px-2 rounded"
-                >
-                  <span className="capitalize">{r.category?.replace("_", " ")}</span>
-                  <span>{formatCurrency(Number(r.amount))}</span>
-                </Link>
-              ))}
+      {/* Recent receipts */}
+      <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--emerald-dim)" }}>
+              <Receipt className="h-3.5 w-3.5" style={{ color: "var(--emerald)" }} />
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No receipts yet</p>
-          )}
-        </CardContent>
-      </Card>
+            Recent Receipts
+          </h2>
+          <Link href="/driver/receipts" className="flex items-center gap-0.5 text-xs font-medium" style={{ color: "var(--indigo-soft)" }}>
+            View all <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        {recentReceipts && recentReceipts.length > 0 ? (
+          <div className="space-y-1">
+            {recentReceipts.map((r) => (
+              <Link key={r.id} href={`/driver/receipts/${r.id}`}
+                className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl hover:bg-accent transition-colors">
+                <span className="text-xs font-medium text-foreground capitalize">{r.category?.replace(/_/g, " ")}</span>
+                <span className="text-xs font-bold text-foreground">{formatCurrency(Number(r.amount))}</span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="py-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">No receipts yet</p>
+            <Link href="/driver/receipts/new" className="text-xs font-medium" style={{ color: "var(--indigo-soft)" }}>
+              Add your first receipt →
+            </Link>
+          </div>
+        )}
+      </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <h2 className="font-semibold">Fleet Overview</h2>
-        </CardHeader>
-        <CardContent>
-          {vehicles && vehicles.length > 0 ? (
-            <div className="space-y-2">
-              {vehicles.slice(0, 5).map((v) => (
-                <Link
-                  key={v.id}
-                  href={`/driver/vehicles/${v.id}`}
-                  className="flex justify-between text-sm py-2 border-b border-neutral-100 last:border-0 hover:bg-neutral-50 -mx-2 px-2 rounded"
-                >
-                  <span>
-                    {v.year} {v.make} {v.model}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {(v.location as unknown as { name: string })?.name ?? "—"}
-                  </span>
-                </Link>
-              ))}
-              {vehicles.length > 5 && (
-                <Link
-                  href="/driver/vehicles"
-                  className="block text-sm text-muted-foreground hover:text-foreground pt-2"
-                >
-                  View all {vehicles.length} vehicles →
-                </Link>
-              )}
+      {/* Fleet overview */}
+      <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--indigo-dim)" }}>
+              <Car className="h-3.5 w-3.5" style={{ color: "var(--indigo-soft)" }} />
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No vehicles in fleet</p>
-          )}
-        </CardContent>
-      </Card>
+            Fleet Overview
+          </h2>
+          <Link href="/driver/vehicles" className="flex items-center gap-0.5 text-xs font-medium" style={{ color: "var(--indigo-soft)" }}>
+            View all <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        {vehicles && vehicles.length > 0 ? (
+          <div className="space-y-1">
+            {vehicles.slice(0, 5).map((v) => (
+              <Link key={v.id} href={`/driver/vehicles/${v.id}`}
+                className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl hover:bg-accent transition-colors">
+                <span className="text-xs font-medium text-foreground">
+                  {v.year} {v.make} {v.model}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {(v.location as unknown as { name: string })?.name ?? "—"}
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground py-2">No vehicles in fleet</p>
+        )}
+      </div>
+
     </div>
   );
 }
