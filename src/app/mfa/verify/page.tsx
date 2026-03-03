@@ -3,105 +3,72 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ShieldCheck, RefreshCw, Mail } from "lucide-react";
+import { ShieldCheck, LogOut } from "lucide-react";
+
+type Status = "loading" | "ready" | "verifying" | "error";
 
 export default function MFAVerifyPage() {
   const [factorId, setFactorId] = useState("");
   const [challengeId, setChallengeId] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "verifying" | "resending">("loading");
-  const [countdown, setCountdown] = useState(0);
-  const [userEmail, setUserEmail] = useState("");
+  const [status, setStatus] = useState<Status>("loading");
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/admin/dashboard";
   const supabase = createClient();
 
-  function startCountdown() {
-    setCountdown(60);
-    const t = setInterval(() => setCountdown((c) => { if (c <= 1) { clearInterval(t); return 0; } return c - 1; }), 1000);
-  }
-
-  const initChallenge = useCallback(async () => {
+  const prepare = useCallback(async () => {
     setError(null);
+    setStatus("loading");
     try {
-      // Get current user's email for display
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) setUserEmail(user.email);
-
-      // Check if already at AAL2 (e.g. refreshed the page after verifying)
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (aal?.currentLevel === "aal2") {
-        router.replace(next);
-        return;
-      }
-
-      // Get enrolled email factor
       const { data: factors } = await supabase.auth.mfa.listFactors();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const emailFactor = (factors?.all ?? []).find((f: any) => f.factor_type === "email" && f.status === "verified");
-
-      if (!emailFactor?.id) {
-        // Not enrolled yet → go to setup
+      const verified = (factors?.totp ?? []).find((f: any) => f.status === "verified");
+      if (!verified) {
         router.replace(`/mfa/setup?next=${encodeURIComponent(next)}`);
         return;
       }
-
-      const fid: string = emailFactor.id;
-      setFactorId(fid);
-
-      // Create challenge → sends OTP email
-      const { data: chal, error: chalErr } = await supabase.auth.mfa.challenge({ factorId: fid });
+      setFactorId(verified.id);
+      const { data: chal, error: chalErr } = await supabase.auth.mfa.challenge({ factorId: verified.id });
       if (chalErr) throw chalErr;
-
       setChallengeId(chal.id);
       setStatus("ready");
-      startCountdown();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to send verification code");
-      setStatus("ready");
+      setError(err instanceof Error ? err.message : "Could not start verification");
+      setStatus("error");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [next]);
 
-  useEffect(() => { initChallenge(); }, [initChallenge]);
-
-  async function resend() {
-    if (countdown > 0) return;
-    setStatus("resending");
-    setError(null);
-    try {
-      const { data, error: chalErr } = await supabase.auth.mfa.challenge({ factorId });
-      if (chalErr) throw chalErr;
-      setChallengeId(data.id);
-      setCode("");
-      startCountdown();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to resend code");
-    } finally {
-      setStatus("ready");
-    }
-  }
+  useEffect(() => { prepare(); }, [prepare]);
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setStatus("verifying");
     try {
-      const { error: verifyErr } = await supabase.auth.mfa.verify({ factorId, challengeId, code });
+      let cid = challengeId;
+      if (!cid) {
+        const { data: chal, error: chalErr } = await supabase.auth.mfa.challenge({ factorId });
+        if (chalErr) throw chalErr;
+        cid = chal.id;
+        setChallengeId(cid);
+      }
+      const { error: verifyErr } = await supabase.auth.mfa.verify({ factorId, challengeId: cid, code });
       if (verifyErr) throw verifyErr;
       router.push(next);
       router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Invalid code — please try again");
       setStatus("ready");
+      setCode("");
     }
   }
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    router.push("/login");
+    router.replace("/login");
   }
 
   return (
@@ -112,45 +79,35 @@ export default function MFAVerifyPage() {
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-indigo">
             <ShieldCheck className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold font-syne text-foreground">Check your email</h1>
+          <h1 className="text-2xl font-bold font-syne text-foreground">Verification required</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            A 6-digit verification code was sent to
-            {userEmail && <span className="block font-medium text-foreground mt-0.5">{userEmail}</span>}
+            Open your authenticator app and enter the 6-digit code for Fleet Manager.
           </p>
         </div>
 
         {status === "loading" && (
           <div className="text-center py-8">
-            <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-3" style={{ borderColor: "var(--indigo)", borderTopColor: "transparent" }} />
-            <p className="text-sm text-muted-foreground">Sending code to your email…</p>
+            <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto"
+              style={{ borderColor: "var(--indigo)", borderTopColor: "transparent" }} />
           </div>
         )}
 
-        {(status === "ready" || status === "verifying" || status === "resending") && (
-          <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-            <div className="flex items-start gap-3 p-3 rounded-xl" style={{ background: "var(--indigo-dim)" }}>
-              <Mail className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "var(--indigo-soft)" }} />
-              <p className="text-sm" style={{ color: "var(--indigo-soft)" }}>
-                Enter the 6-digit code from the email. Codes expire after 10 minutes.
-              </p>
-            </div>
-
+        {(status === "ready" || status === "verifying" || status === "error") && (
+          <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
             <form onSubmit={handleVerify} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Verification Code</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={6}
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                  placeholder="000000"
-                  autoFocus
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-input bg-background text-foreground text-center text-2xl font-bold font-syne tracking-[0.5em] focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground/30 placeholder:tracking-normal"
-                />
-              </div>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="000000"
+                autoFocus
+                required
+                disabled={status === "verifying"}
+                className="w-full px-4 py-3 rounded-xl border border-input bg-background text-foreground text-center text-2xl font-bold font-syne tracking-[0.5em] focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground/30 placeholder:tracking-normal disabled:opacity-50"
+              />
 
               {error && (
                 <p className="text-sm p-3 rounded-xl" style={{ background: "var(--rose-dim)", color: "var(--rose)" }}>
@@ -158,33 +115,26 @@ export default function MFAVerifyPage() {
                 </p>
               )}
 
-              <button
-                type="submit"
-                disabled={status === "verifying" || code.length < 6}
+              <button type="submit" disabled={status === "verifying" || code.length < 6}
                 className="w-full py-2.5 rounded-xl font-medium text-sm text-white disabled:opacity-50 transition-all"
-                style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)" }}
-              >
+                style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)" }}>
                 {status === "verifying" ? "Verifying…" : "Verify"}
               </button>
             </form>
 
-            <button
-              type="button"
-              onClick={resend}
-              disabled={countdown > 0 || status === "resending"}
-              className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              {status === "resending" ? "Sending…" : countdown > 0 ? `Resend in ${countdown}s` : "Resend code"}
-            </button>
+            <div className="h-px bg-border" />
 
-            <div className="border-t border-border pt-4 text-center">
-              <button onClick={handleSignOut} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Not you? Sign out
-              </button>
-            </div>
+            <button onClick={handleSignOut}
+              className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+              <LogOut className="h-3.5 w-3.5" />
+              Sign out and use a different account
+            </button>
           </div>
         )}
+
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Using <strong>Microsoft Authenticator</strong>, Google Authenticator, or Authy
+        </p>
       </div>
     </main>
   );

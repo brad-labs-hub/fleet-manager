@@ -75,9 +75,9 @@ export default async function AdminUsersPage() {
           <Users className="h-4 w-4" style={{ color: "var(--indigo-soft)" }} />
         </div>
         <div className="space-y-1.5">
-          <p className="text-sm font-semibold text-foreground">Microsoft SSO + mandatory email MFA</p>
+          <p className="text-sm font-semibold text-foreground">Microsoft SSO + mandatory authenticator app MFA</p>
           <p className="text-xs text-muted-foreground">
-            All users are required to verify via email MFA on every login. Microsoft SSO is also available — users log in with their Microsoft account and must still complete the email OTP step.
+            All users must complete TOTP two-factor authentication on every login using an authenticator app (Microsoft Authenticator, Google Authenticator, or Authy). Microsoft SSO is also supported.
           </p>
           <p className="text-xs text-muted-foreground">
             To enable Microsoft SSO, configure the Azure provider in{" "}
@@ -85,12 +85,12 @@ export default async function AdminUsersPage() {
               className="underline underline-offset-2" style={{ color: "var(--indigo-soft)" }}>
               Supabase Auth → Providers
             </a>.
-            To enable email MFA, go to{" "}
+            TOTP MFA is enabled in{" "}
             <a href="https://supabase.com/dashboard/project/_/auth/mfa" target="_blank" rel="noopener noreferrer"
               className="underline underline-offset-2" style={{ color: "var(--indigo-soft)" }}>
               Supabase Auth → MFA
             </a>{" "}
-            and enable the <strong>Email OTP</strong> factor.
+            — ensure <strong>TOTP (App Authenticator)</strong> is set to <strong>Enabled</strong>.
           </p>
         </div>
       </div>
