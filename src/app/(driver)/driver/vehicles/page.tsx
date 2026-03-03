@@ -24,6 +24,7 @@ export default async function VehiclesListPage() {
                     make={v.make}
                     model={v.model}
                     year={v.year}
+                    color={v.color}
                     vin={v.vin}
                     className="w-full h-full"
                   />

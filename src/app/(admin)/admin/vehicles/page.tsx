@@ -20,7 +20,7 @@ export default async function AdminVehiclesPage() {
   const supabase = await createClient();
   const { data: vehicles } = await supabase
     .from("vehicles")
-    .select("id, make, model, year, vin, license_plate, status, location:locations(name)")
+    .select("id, make, model, year, vin, color, license_plate, status, location:locations(name)")
     .order("make");
 
   return (
@@ -42,6 +42,7 @@ export default async function AdminVehiclesPage() {
                     make={v.make}
                     model={v.model}
                     year={v.year}
+                    color={v.color}
                     vin={v.vin}
                     className="w-full h-full"
                   />
