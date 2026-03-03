@@ -18,7 +18,7 @@ export default async function AdminVehiclesPage() {
 
   const vehiclesWithUrls = (vehicles ?? []).map((v) => ({
     ...v,
-    location: v.location as { name: string } | null,
+    location: (Array.isArray(v.location) ? v.location[0] : v.location) as { name: string } | null,
     previewUrl: v.preview_image_path
       ? supabase.storage
           .from("vehicle-previews")
