@@ -106,7 +106,7 @@ function LoginForm() {
           </div>
           <button
             type="submit"
-            disabled={loading || msLoading}
+            disabled={loading}
             className="w-full py-2.5 rounded-xl font-medium text-sm transition-all disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)", color: "#fff" }}
           >
