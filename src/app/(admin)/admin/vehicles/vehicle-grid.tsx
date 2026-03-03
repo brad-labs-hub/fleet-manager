@@ -51,7 +51,6 @@ const STATUS_PILL_OPTIONS: { value: StatusFilter; label: string }[] = [
 
 export function VehicleGrid({
   vehicles,
-  locations,
 }: {
   vehicles: Vehicle[];
   locations: Location[];
@@ -79,7 +78,6 @@ export function VehicleGrid({
     });
   }, [vehicles, locationFilter, statusFilter]);
 
-  const activeCount   = vehicles.filter((v) => !INACTIVE_STATUSES.has(v.status ?? "")).length;
   const inactiveCount = vehicles.filter((v) => INACTIVE_STATUSES.has(v.status ?? "")).length;
 
   return (
