@@ -42,13 +42,13 @@ export default function MFAVerifyPage() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const emailFactor = (factors?.all ?? []).find((f: any) => f.factor_type === "email" && f.status === "verified");
 
-      if (!emailFactor) {
+      if (!emailFactor?.id) {
         // Not enrolled yet → go to setup
         router.replace(`/mfa/setup?next=${encodeURIComponent(next)}`);
         return;
       }
 
-      const fid = emailFactor.id;
+      const fid: string = emailFactor.id;
       setFactorId(fid);
 
       // Create challenge → sends OTP email
