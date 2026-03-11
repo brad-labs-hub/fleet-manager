@@ -1,10 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
+import type { ImageBlockParam, TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 import { NextRequest, NextResponse } from "next/server";
 import { RECEIPT_CATEGORIES, type ReceiptCategory } from "@/types/database";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const PROMPT = `You are a receipt parser. Extract the following fields from this receipt image and return ONLY valid JSON with no markdown, no code fences, no explanation:
+const PROMPT = `You are a receipt parser. Extract the following fields from this receipt and return ONLY valid JSON with no markdown, no code fences, no explanation:
 {
   "vendor": "merchant or store name, or null if not found",
   "amount": total amount as a plain number (e.g. 45.23), or null if not found,
@@ -50,9 +51,6 @@ export async function POST(req: NextRequest) {
   }
 
   const mimeType = file.type;
-
-  // Claude vision only supports image types directly; PDFs need to be sent as document blocks
-  // We support JPEG, PNG, GIF, WEBP as images; PDF as a document
   const isPdf = mimeType === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
   const isImage = isValidImageType(mimeType);
 
@@ -63,58 +61,45 @@ export async function POST(req: NextRequest) {
   try {
     const buffer = await file.arrayBuffer();
     const base64 = Buffer.from(buffer).toString("base64");
+    const textBlock: TextBlockParam = { type: "text", text: PROMPT };
 
-    let message;
+    let rawText: string;
 
     if (isPdf) {
-      // Claude supports PDF documents natively via the document block type
-      message = await client.messages.create({
-        model: "claude-3-haiku-20240307",
+      // PDFs: use claude-3-5-sonnet which supports native PDF documents
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pdfBlock: any = {
+        type: "document",
+        source: { type: "base64", media_type: "application/pdf", data: base64 },
+      };
+      const msg = await client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
         max_tokens: 512,
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "document",
-                source: {
-                  type: "base64",
-                  media_type: "application/pdf",
-                  data: base64,
-                },
-              } as Parameters<typeof client.messages.create>[0]["messages"][0]["content"][number],
-              { type: "text", text: PROMPT },
-            ],
-          },
-        ],
+        messages: [{ role: "user", content: [pdfBlock, textBlock] }],
       });
+      rawText = msg.content
+        .filter((b) => b.type === "text")
+        .map((b) => (b as { type: "text"; text: string }).text)
+        .join("");
     } else {
-      message = await client.messages.create({
+      const imageBlock: ImageBlockParam = {
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: mimeType as ValidImageType,
+          data: base64,
+        },
+      };
+      const msg = await client.messages.create({
         model: "claude-3-haiku-20240307",
         max_tokens: 512,
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "image",
-                source: {
-                  type: "base64",
-                  media_type: mimeType as ValidImageType,
-                  data: base64,
-                },
-              },
-              { type: "text", text: PROMPT },
-            ],
-          },
-        ],
+        messages: [{ role: "user", content: [imageBlock, textBlock] }],
       });
+      rawText = msg.content
+        .filter((b) => b.type === "text")
+        .map((b) => (b as { type: "text"; text: string }).text)
+        .join("");
     }
-
-    const rawText = message.content
-      .filter((b) => b.type === "text")
-      .map((b) => (b as { type: "text"; text: string }).text)
-      .join("");
 
     // Strip any accidental markdown fences
     const cleaned = rawText.replace(/```[a-z]*\n?/gi, "").trim();
@@ -126,16 +111,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to parse AI response" }, { status: 502 });
     }
 
-    // Validate and sanitise each field
     const result: ScanResult = {
       vendor: typeof parsed.vendor === "string" && parsed.vendor ? parsed.vendor : null,
       amount:
         typeof parsed.amount === "number" && isFinite(parsed.amount) && parsed.amount > 0
           ? Math.round(parsed.amount * 100) / 100
           : null,
-      date: typeof parsed.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.date)
-        ? parsed.date
-        : null,
+      date:
+        typeof parsed.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.date)
+          ? parsed.date
+          : null,
       category:
         typeof parsed.category === "string" &&
         RECEIPT_CATEGORIES.includes(parsed.category as ReceiptCategory)
