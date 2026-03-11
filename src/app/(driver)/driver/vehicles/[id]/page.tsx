@@ -24,7 +24,8 @@ export default async function VehicleDetailPage({
       maintenance_records(*),
       maintenance_alerts(*),
       insurance(*),
-      registrations(*)
+      registrations(*),
+      vehicle_emissions(*)
     `
     )
     .eq("id", id)
@@ -71,6 +72,9 @@ export default async function VehicleDetailPage({
           </Link>
           <Link href={`/driver/vehicles/${id}/inspection/new`}>
             <Button size="sm" variant="outline">Pre-trip inspection</Button>
+          </Link>
+          <Link href={`/driver/vehicles/${id}/emissions/new`}>
+            <Button size="sm" variant="outline">Log emission test</Button>
           </Link>
           <Link href={`/driver/vehicles/${id}/maintenance/new`}>
             <Button size="sm">Log Maintenance</Button>
@@ -148,7 +152,7 @@ export default async function VehicleDetailPage({
             <FileText className="h-5 w-5 text-primary" />
             Documents
           </h2>
-          <p className="text-sm text-muted-foreground">Insurance and registration — tap to open PDF</p>
+          <p className="text-sm text-muted-foreground">Insurance, registration, and emissions — tap to open PDF</p>
         </CardHeader>
         <CardContent className="space-y-5">
           <section>
@@ -224,6 +228,59 @@ export default async function VehicleDetailPage({
             ) : (
               <p className="text-sm text-muted-foreground">No registration records</p>
             )}
+          </section>
+          <section>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Emissions</h3>
+            {(vehicle.vehicle_emissions as unknown[])?.length > 0 ? (
+              <ul className="space-y-2">
+                {(vehicle.vehicle_emissions as {
+                  id: string;
+                  test_date: string;
+                  passed: boolean;
+                  expiry_date: string | null;
+                  document_url: string | null;
+                }[])
+                  .sort((a, b) => b.test_date.localeCompare(a.test_date))
+                  .map((e) => (
+                    <li key={e.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between rounded-lg p-3 bg-muted/40">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-foreground">{formatDate(e.test_date)}</span>
+                          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                            e.passed
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                          }`}>
+                            {e.passed ? "Pass" : "Fail"}
+                          </span>
+                        </div>
+                        {e.expiry_date && (
+                          <p className="text-xs text-muted-foreground">Expires {formatDate(e.expiry_date)}</p>
+                        )}
+                      </div>
+                      {e.document_url ? (
+                        <a
+                          href={e.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
+                          aria-label="View emissions certificate"
+                        >
+                          <FileText className="h-4 w-4" />
+                          View PDF
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No document</span>
+                      )}
+                    </li>
+                  ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No emissions records</p>
+            )}
+            <Link href={`/driver/vehicles/${id}/emissions/new`} className="mt-3 inline-block">
+              <Button variant="outline" size="sm">Log emission test</Button>
+            </Link>
           </section>
         </CardContent>
       </Card>

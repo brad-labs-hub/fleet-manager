@@ -36,6 +36,7 @@ export default async function AdminVehicleDetailPage({
       maintenance_records(*),
       insurance(*),
       registrations(*),
+      vehicle_emissions(*),
       keys(*)
     `
       )
@@ -91,6 +92,9 @@ export default async function AdminVehicleDetailPage({
           </Link>
           <Link href={`/admin/vehicles/${id}/alerts`}>
             <Button variant="outline">Alerts</Button>
+          </Link>
+          <Link href={`/admin/vehicles/${id}/emissions/new`}>
+            <Button variant="outline">Add Emission</Button>
           </Link>
           <Link href={`/admin/vehicles/${id}/maintenance`}>
             <Button variant="outline">Maintenance</Button>
@@ -226,6 +230,63 @@ export default async function AdminVehicleDetailPage({
             </ul>
           ) : (
             <p className="text-muted-foreground">No registration records</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold text-foreground">Emissions</h2>
+            <Link
+              href={`/admin/vehicles/${id}/emissions/new`}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Add
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {(vehicle.vehicle_emissions as unknown[])?.length ? (
+            <ul className="space-y-2 text-sm">
+              {(vehicle.vehicle_emissions as {
+                id: string;
+                test_date: string;
+                passed: boolean;
+                expiry_date: string | null;
+                document_url: string | null;
+              }[])
+                .sort((a, b) => b.test_date.localeCompare(a.test_date))
+                .map((e) => (
+                  <li key={e.id} className="flex justify-between items-center gap-2">
+                    <span className="text-foreground flex items-center gap-2">
+                      {formatDate(e.test_date)}
+                      <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                        e.passed
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                      }`}>
+                        {e.passed ? "Pass" : "Fail"}
+                      </span>
+                      {e.expiry_date && (
+                        <span className="text-muted-foreground text-xs">expires {formatDate(e.expiry_date)}</span>
+                      )}
+                    </span>
+                    {e.document_url && (
+                      <a
+                        href={e.document_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline text-xs font-medium shrink-0"
+                      >
+                        View
+                      </a>
+                    )}
+                  </li>
+                ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">No emissions records</p>
           )}
         </CardContent>
       </Card>
