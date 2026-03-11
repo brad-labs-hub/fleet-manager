@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { formatDate, formatCurrency } from "@/lib/utils";
-import { FileText, ExternalLink, Upload, Loader2, Paperclip } from "lucide-react";
+import { FileText, ExternalLink, Loader2, Paperclip } from "lucide-react";
 
 const STATUS_STYLES: Record<string, string> = {
   completed:   "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
