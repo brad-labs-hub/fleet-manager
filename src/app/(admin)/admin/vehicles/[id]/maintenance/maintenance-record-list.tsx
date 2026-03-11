@@ -4,7 +4,18 @@ import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { formatDate, formatCurrency } from "@/lib/utils";
-import { FileText, ExternalLink, Loader2, Paperclip, Trash2 } from "lucide-react";
+import { FileText, ExternalLink, Loader2, Paperclip, Trash2, ArrowUpDown } from "lucide-react";
+
+type SortField = "date" | "cost" | "type";
+type SortDir = "desc" | "asc";
+
+const SORT_OPTIONS: { field: SortField; dir: SortDir; label: string }[] = [
+  { field: "date",  dir: "desc", label: "Newest first" },
+  { field: "date",  dir: "asc",  label: "Oldest first" },
+  { field: "cost",  dir: "desc", label: "Cost: high → low" },
+  { field: "cost",  dir: "asc",  label: "Cost: low → high" },
+  { field: "type",  dir: "asc",  label: "Type: A → Z" },
+];
 
 const STATUS_STYLES: Record<string, string> = {
   completed:   "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
@@ -50,6 +61,31 @@ export function MaintenanceRecordList({
 
   // Local optimistic receipt_url map so the link appears immediately
   const [localUrls, setLocalUrls] = useState<Record<string, string>>({});
+
+  // Sorting — default newest first
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDir, setSortDir]     = useState<SortDir>("desc");
+
+  const sortedRecords = [...initialRecords].sort((a, b) => {
+    let cmp = 0;
+    if (sortField === "date") {
+      cmp = a.date.localeCompare(b.date);
+    } else if (sortField === "cost") {
+      cmp = (a.cost ?? 0) - (b.cost ?? 0);
+    } else if (sortField === "type") {
+      cmp = a.type.localeCompare(b.type);
+    }
+    return sortDir === "desc" ? -cmp : cmp;
+  });
+
+  function handleSortChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const opt = SORT_OPTIONS[Number(e.target.value)];
+    if (opt) { setSortField(opt.field); setSortDir(opt.dir); }
+  }
+
+  const currentSortIndex = SORT_OPTIONS.findIndex(
+    (o) => o.field === sortField && o.dir === sortDir
+  );
 
   // Soft-delete: hide rows optimistically after deletion
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
@@ -110,8 +146,27 @@ export function MaintenanceRecordList({
   }
 
   return (
-    <ul className="divide-y divide-border">
-      {initialRecords.map((m) => {
+    <div>
+      {/* Sort control */}
+      <div className="flex items-center gap-2 px-6 py-3 border-b border-border bg-muted/30">
+        <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+        <label htmlFor="maintenance-sort" className="text-xs text-muted-foreground shrink-0">
+          Sort by
+        </label>
+        <select
+          id="maintenance-sort"
+          value={currentSortIndex === -1 ? 0 : currentSortIndex}
+          onChange={handleSortChange}
+          className="text-xs bg-transparent text-foreground border-0 outline-none cursor-pointer hover:text-primary transition-colors"
+        >
+          {SORT_OPTIONS.map((opt, i) => (
+            <option key={i} value={i}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <ul className="divide-y divide-border">
+      {sortedRecords.map((m) => {
         if (deletedIds.has(m.id)) return null;
 
         const status = m.status ?? "completed";
@@ -255,6 +310,7 @@ export function MaintenanceRecordList({
           </li>
         );
       })}
-    </ul>
+      </ul>
+    </div>
   );
 }
