@@ -51,11 +51,14 @@ function LoginForm() {
 
         {/* Brand */}
         <div className="text-center mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-indigo">
-            <span className="text-white font-bold font-syne text-base">FM</span>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-bold text-base tracking-tight">FM</span>
           </div>
-          <h1 className="text-2xl font-bold font-syne text-foreground">Fleet Manager</h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in to your account</p>
+          <h1 className="text-2xl font-extrabold tracking-tight leading-none">
+            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">Fleet</span>
+            <span className="text-foreground ml-1.5">Manager</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-2">Sign in to your account</p>
         </div>
 
         {resetSuccess && (
