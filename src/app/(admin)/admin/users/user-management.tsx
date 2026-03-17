@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, UserPlus, X, Check } from "lucide-react";
+import { Mail, UserPlus, X, Check, MoreHorizontal, KeyRound, Shield, Copy } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const ROLE_LABELS: Record<string, string> = {
   driver: "Driver",
@@ -160,6 +167,8 @@ type UserRow = { id: string; email: string | null; name: string | null; role: st
 export function UserList({ users, currentUserId }: { users: UserRow[]; currentUserId: string }) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [linkModal, setLinkModal] = useState<{ link: string; title: string } | null>(null);
   const router = useRouter();
 
   const ROLE_BADGE: Record<string, string> = {
@@ -197,6 +206,69 @@ export function UserList({ users, currentUserId }: { users: UserRow[]; currentUs
     }
   }
 
+  async function handleReinvite(userId: string) {
+    setActionLoading(userId);
+    try {
+      const res = await fetch("/api/admin/reinvite-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed");
+      if (json.link) setLinkModal({ link: json.link, title: "Magic link (copy and send to user)" });
+      else router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to re-invite");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleResetMfa(userId: string) {
+    if (!confirm("Remove MFA for this user? They will need to set it up again on next login.")) return;
+    setActionLoading(userId);
+    try {
+      const res = await fetch("/api/admin/reset-mfa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed");
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to reset MFA");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleResetPassword(userId: string) {
+    setActionLoading(userId);
+    try {
+      const res = await fetch("/api/admin/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed");
+      if (json.link) setLinkModal({ link: json.link, title: "Password reset link (copy and send to user)" });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to generate reset link");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  function copyLink() {
+    if (linkModal) {
+      navigator.clipboard.writeText(linkModal.link);
+      setLinkModal(null);
+    }
+  }
+
   if (users.length === 0) {
     return (
       <div className="text-center py-12 rounded-2xl border border-border bg-card">
@@ -207,7 +279,34 @@ export function UserList({ users, currentUserId }: { users: UserRow[]; currentUs
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+    <>
+      {linkModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setLinkModal(null)}>
+          <div
+            className="rounded-2xl border border-border bg-card p-5 max-w-lg w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-semibold text-foreground mb-2">{linkModal.title}</h3>
+            <p className="text-xs text-muted-foreground mb-3">Copy this link and send it to the user securely.</p>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={linkModal.link}
+                className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-foreground text-xs font-mono truncate"
+              />
+              <Button size="sm" onClick={copyLink} className="shrink-0">
+                <Copy className="h-3.5 w-3.5 mr-1" />
+                Copy
+              </Button>
+            </div>
+            <Button variant="outline" size="sm" className="mt-4" onClick={() => setLinkModal(null)}>
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
@@ -253,13 +352,45 @@ export function UserList({ users, currentUserId }: { users: UserRow[]; currentUs
               </td>
               <td className="px-5 py-3.5 text-right">
                 {u.id !== currentUserId && (
-                  <button
-                    onClick={() => handleDelete(u.id, u.email)}
-                    disabled={deleting === u.id}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 transition-all disabled:opacity-40"
-                  >
-                    {deleting === u.id ? "Removing…" : "Remove"}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          disabled={actionLoading === u.id}
+                        >
+                          {actionLoading === u.id ? (
+                            <span className="text-xs">…</span>
+                          ) : (
+                            <MoreHorizontal className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="min-w-[10rem]">
+                        <DropdownMenuItem onClick={() => handleReinvite(u.id)}>
+                          <Mail className="h-3.5 w-3.5 mr-2" />
+                          Re-invite
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleResetMfa(u.id)}>
+                          <Shield className="h-3.5 w-3.5 mr-2" />
+                          Reset MFA
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleResetPassword(u.id)}>
+                          <KeyRound className="h-3.5 w-3.5 mr-2" />
+                          Reset password
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <button
+                      onClick={() => handleDelete(u.id, u.email)}
+                      disabled={deleting === u.id}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 transition-all disabled:opacity-40"
+                    >
+                      {deleting === u.id ? "Removing…" : "Remove"}
+                    </button>
+                  </div>
                 )}
               </td>
             </tr>
@@ -267,5 +398,6 @@ export function UserList({ users, currentUserId }: { users: UserRow[]; currentUs
         </tbody>
       </table>
     </div>
+    </>
   );
 }
