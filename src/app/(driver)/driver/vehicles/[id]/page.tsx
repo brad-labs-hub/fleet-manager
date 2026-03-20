@@ -13,7 +13,7 @@ export default async function VehicleDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: vehicle, error } = await supabase
+  const { data: vehicleRow, error } = await supabase
     .from("vehicles")
     .select(
       `
@@ -25,7 +25,6 @@ export default async function VehicleDetailPage({
       maintenance_alerts(*),
       insurance(*),
       registrations(*),
-      vehicle_warranties(*),
       vehicle_emissions(*)
     `
     )
@@ -39,7 +38,13 @@ export default async function VehicleDetailPage({
     .order("inspected_at", { ascending: false })
     .limit(5);
 
-  if (error || !vehicle) notFound();
+  if (error || !vehicleRow) notFound();
+
+  const warrantiesRes = await supabase.from("vehicle_warranties").select("*").eq("vehicle_id", id);
+  const vehicle = {
+    ...vehicleRow,
+    vehicle_warranties: warrantiesRes.error ? [] : (warrantiesRes.data ?? []),
+  };
 
   const loc = vehicle.location as { name: string; code: string } | null;
 

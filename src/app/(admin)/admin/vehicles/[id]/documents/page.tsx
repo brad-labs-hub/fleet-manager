@@ -166,7 +166,7 @@ export default async function VehicleDocumentsPage({
   const vehicle = vehicleRes.data;
   const insuranceItems = (vehicle.insurance as { id: string; provider: string; policy_number: string | null; expiry_date: string; document_url: string | null }[]) ?? [];
   const registrationItems = (vehicle.registrations as { id: string; state: string; expiry_date: string; document_url: string | null }[]) ?? [];
-  const warrantyItems = warrantiesRes.data ?? [];
+  const warrantyItems = warrantiesRes.error ? [] : (warrantiesRes.data ?? []);
   const emissionsItems = emissionsRes.data ?? [];
   const vehicleDocsItems = vehicleDocsRes.data ?? [];
   const maintenanceItems = maintenanceRes.data ?? [];

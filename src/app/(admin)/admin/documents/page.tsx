@@ -57,7 +57,7 @@ export default async function FleetDocumentsPage() {
     }
   }
 
-  for (const w of warrantiesRes.data ?? []) {
+  for (const w of warrantiesRes.error ? [] : (warrantiesRes.data ?? [])) {
     if (w.document_url) {
       const typeLabel = w.warranty_type?.replace(/_/g, " ") ?? "Warranty";
       const subtitle = w.expiry_date

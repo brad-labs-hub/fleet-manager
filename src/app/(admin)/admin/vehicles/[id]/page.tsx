@@ -37,7 +37,6 @@ export default async function AdminVehicleDetailPage({
       insurance(*),
       registrations(*),
       vehicle_emissions(*),
-      vehicle_warranties(*),
       keys(*)
     `
       )
@@ -49,7 +48,7 @@ export default async function AdminVehicleDetailPage({
     supabase.from("user_profiles").select("id, name, email").eq("role", "driver"),
   ]);
 
-  const { data: vehicle, error } = vehicleRes;
+  const { data: vehicleRow, error } = vehicleRes;
   const receiptsYtd = (receiptsSumRes.data ?? []).reduce((s, r) => s + Number(r.amount), 0);
   const maintenanceYtd = (maintenanceSumRes.data ?? []).reduce((s, m) => s + Number(m.cost ?? 0), 0);
   const totalYtd = receiptsYtd + maintenanceYtd;
@@ -61,7 +60,14 @@ export default async function AdminVehicleDetailPage({
     .filter(Boolean)
     .map((d) => ({ user_id: d!.id, name: d!.name, email: d!.email }));
 
-  if (error || !vehicle) notFound();
+  if (error || !vehicleRow) notFound();
+
+  // Fetch warranties separately so missing migration/table does not break the whole page
+  const warrantiesRes = await supabase.from("vehicle_warranties").select("*").eq("vehicle_id", id);
+  const vehicle = {
+    ...vehicleRow,
+    vehicle_warranties: warrantiesRes.error ? [] : (warrantiesRes.data ?? []),
+  };
 
   return (
     <div className="space-y-6">
