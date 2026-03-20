@@ -25,6 +25,7 @@ export default async function VehicleDetailPage({
       maintenance_alerts(*),
       insurance(*),
       registrations(*),
+      vehicle_warranties(*),
       vehicle_emissions(*)
     `
     )
@@ -152,7 +153,7 @@ export default async function VehicleDetailPage({
             <FileText className="h-5 w-5 text-primary" />
             Documents
           </h2>
-          <p className="text-sm text-muted-foreground">Insurance, registration, and emissions — tap to open PDF</p>
+          <p className="text-sm text-muted-foreground">Insurance, registration, warranty, and emissions — tap to open PDF</p>
         </CardHeader>
         <CardContent className="space-y-5">
           <section>
@@ -227,6 +228,51 @@ export default async function VehicleDetailPage({
               </ul>
             ) : (
               <p className="text-sm text-muted-foreground">No registration records</p>
+            )}
+          </section>
+          <section>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Warranty</h3>
+            {(vehicle.vehicle_warranties as unknown[])?.length > 0 ? (
+              <ul className="space-y-2">
+                {(vehicle.vehicle_warranties as {
+                  id: string;
+                  warranty_type: string;
+                  expiry_date: string | null;
+                  expiry_miles: number | null;
+                  document_url: string | null;
+                }[]).map((w) => {
+                  const typeLabel = w.warranty_type?.replace(/_/g, " ") ?? "Warranty";
+                  const expiry = w.expiry_date
+                    ? `Expires ${formatDate(w.expiry_date)}`
+                    : w.expiry_miles
+                      ? `Expires at ${w.expiry_miles.toLocaleString()} mi`
+                      : null;
+                  return (
+                    <li key={w.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between gap-2 rounded-lg p-3 bg-muted/40">
+                      <div>
+                        <span className="font-medium text-foreground capitalize">{typeLabel}</span>
+                        {expiry && <p className="text-xs text-muted-foreground">{expiry}</p>}
+                      </div>
+                      {w.document_url ? (
+                        <a
+                          href={w.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
+                          aria-label="View warranty PDF"
+                        >
+                          <FileText className="h-4 w-4" />
+                          View PDF
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No document</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No warranty records</p>
             )}
           </section>
           <section>

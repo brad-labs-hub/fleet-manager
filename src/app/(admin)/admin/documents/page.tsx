@@ -6,10 +6,11 @@ import { DocumentLibrary, type DocumentItem } from "../vehicles/[id]/documents/d
 export default async function FleetDocumentsPage() {
   const supabase = await createClient();
 
-  const [vehiclesRes, insuranceRes, registrationsRes, emissionsRes, vehicleDocsRes, maintenanceRes] = await Promise.all([
+  const [vehiclesRes, insuranceRes, registrationsRes, warrantiesRes, emissionsRes, vehicleDocsRes, maintenanceRes] = await Promise.all([
     supabase.from("vehicles").select("id, year, make, model").order("make"),
     supabase.from("insurance").select("id, vehicle_id, provider, policy_number, expiry_date, document_url"),
     supabase.from("registrations").select("id, vehicle_id, state, expiry_date, document_url"),
+    supabase.from("vehicle_warranties").select("id, vehicle_id, warranty_type, expiry_date, expiry_miles, document_url, created_at"),
     supabase.from("vehicle_emissions").select("id, vehicle_id, test_date, passed, expiry_date, document_url"),
     supabase.from("vehicle_documents").select("id, vehicle_id, doc_type, title, document_url, notes, created_at"),
     supabase.from("maintenance_records").select("id, vehicle_id, type, date, receipt_url").not("receipt_url", "is", null),
@@ -51,6 +52,30 @@ export default async function FleetDocumentsPage() {
         expiryDate: r.expiry_date,
         vehicleId: r.vehicle_id,
         vehicleLabel: vehicleMap.get(r.vehicle_id) ?? undefined,
+        canDelete: true,
+      });
+    }
+  }
+
+  for (const w of warrantiesRes.data ?? []) {
+    if (w.document_url) {
+      const typeLabel = w.warranty_type?.replace(/_/g, " ") ?? "Warranty";
+      const subtitle = w.expiry_date
+        ? `Expires ${w.expiry_date}`
+        : w.expiry_miles
+          ? `Expires at ${w.expiry_miles.toLocaleString()} mi`
+          : typeLabel;
+      items.push({
+        id: `warr-${w.id}`,
+        source: "warranty",
+        sourceId: w.id,
+        title: typeLabel,
+        subtitle,
+        documentUrl: w.document_url,
+        date: w.expiry_date ?? w.created_at.slice(0, 10),
+        expiryDate: w.expiry_date ?? undefined,
+        vehicleId: w.vehicle_id,
+        vehicleLabel: vehicleMap.get(w.vehicle_id) ?? undefined,
         canDelete: true,
       });
     }

@@ -37,6 +37,7 @@ export default async function AdminVehicleDetailPage({
       insurance(*),
       registrations(*),
       vehicle_emissions(*),
+      vehicle_warranties(*),
       keys(*)
     `
       )
@@ -230,6 +231,61 @@ export default async function AdminVehicleDetailPage({
             </ul>
           ) : (
             <p className="text-muted-foreground">No registration records</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold text-foreground">Warranty</h2>
+            <Link
+              href={`/admin/vehicles/${id}/documents`}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Add
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {(vehicle.vehicle_warranties as unknown[])?.length ? (
+            <ul className="space-y-2 text-sm">
+              {(vehicle.vehicle_warranties as {
+                id: string;
+                warranty_type: string;
+                expiry_date: string | null;
+                expiry_miles: number | null;
+                document_url: string | null;
+              }[]).map((w) => {
+                const typeLabel = w.warranty_type?.replace(/_/g, " ") ?? "Warranty";
+                const expiry = w.expiry_date
+                  ? `expires ${formatDate(w.expiry_date)}`
+                  : w.expiry_miles
+                    ? `expires at ${w.expiry_miles.toLocaleString()} mi`
+                    : null;
+                return (
+                  <li key={w.id} className="flex justify-between items-center gap-2">
+                    <span className="text-foreground capitalize">{typeLabel}</span>
+                    <span className="flex items-center gap-2">
+                      {expiry && <span className="text-muted-foreground">{expiry}</span>}
+                      {w.document_url && (
+                        <a
+                          href={w.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-xs font-medium"
+                          aria-label="View warranty document"
+                        >
+                          View
+                        </a>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground">No warranty records</p>
           )}
         </CardContent>
       </Card>

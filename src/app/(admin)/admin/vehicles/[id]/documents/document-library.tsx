@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { FileText, Search, Trash2, ExternalLink } from "lucide-react";
 
-export type DocumentSource = "insurance" | "registration" | "emissions" | "vault" | "maintenance";
+export type DocumentSource = "insurance" | "registration" | "warranty" | "emissions" | "vault" | "maintenance";
 
 export type DocumentItem = {
   id: string;
@@ -26,6 +26,7 @@ export type DocumentItem = {
 const SOURCE_LABELS: Record<DocumentSource, string> = {
   insurance: "Insurance",
   registration: "Registration",
+  warranty: "Warranty",
   emissions: "Emissions",
   vault: "Vault",
   maintenance: "Maintenance",
@@ -34,6 +35,7 @@ const SOURCE_LABELS: Record<DocumentSource, string> = {
 const SOURCE_BADGE_STYLES: Record<DocumentSource, string> = {
   insurance: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
   registration: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  warranty: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   emissions: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
   vault: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
   maintenance: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
@@ -119,6 +121,8 @@ export function DocumentLibrary({
         await supabase.from("insurance").delete().eq("id", item.sourceId);
       } else if (item.source === "registration") {
         await supabase.from("registrations").delete().eq("id", item.sourceId);
+      } else if (item.source === "warranty") {
+        await supabase.from("vehicle_warranties").delete().eq("id", item.sourceId);
       } else if (item.source === "emissions") {
         await supabase.from("vehicle_emissions").delete().eq("id", item.sourceId);
       } else if (item.source === "vault") {

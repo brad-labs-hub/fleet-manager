@@ -23,6 +23,15 @@ export type KeyType = "primary" | "spare" | "valet";
 
 export type TireType = "summer" | "winter" | "all_season";
 
+export type WarrantyType =
+  | "limited_warranty"
+  | "powertrain_warranty"
+  | "bumper_to_bumper"
+  | "corrosion_warranty"
+  | "emissions_warranty"
+  | "hybrid_battery_warranty"
+  | "other";
+
 export type CarRequestStatus = "pending" | "approved" | "denied" | "completed";
 
 export interface Location {
@@ -120,6 +129,27 @@ export interface VehicleDocument {
   notes: string | null;
   created_at: string;
 }
+
+export interface VehicleWarranty {
+  id: string;
+  vehicle_id: string;
+  warranty_type: WarrantyType;
+  expiry_date: string | null;
+  expiry_miles: number | null;
+  notes: string | null;
+  document_url: string | null;
+  created_at: string;
+}
+
+export const WARRANTY_TYPES: { value: WarrantyType; label: string }[] = [
+  { value: "limited_warranty", label: "Limited warranty" },
+  { value: "powertrain_warranty", label: "Powertrain warranty" },
+  { value: "bumper_to_bumper", label: "Bumper-to-bumper" },
+  { value: "corrosion_warranty", label: "Corrosion warranty" },
+  { value: "emissions_warranty", label: "Emissions warranty" },
+  { value: "hybrid_battery_warranty", label: "Hybrid/electric battery warranty" },
+  { value: "other", label: "Other" },
+];
 
 export const RECEIPT_CATEGORIES: ReceiptCategory[] = [
   "gas",

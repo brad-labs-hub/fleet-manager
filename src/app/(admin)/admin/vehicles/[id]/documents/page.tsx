@@ -4,12 +4,13 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DocumentUpload } from "./document-upload";
 import { DocumentLibrary, type DocumentItem } from "./document-library";
-import { AddInsuranceForm, AddRegistrationForm } from "./insurance-registration-forms";
+import { AddInsuranceForm, AddRegistrationForm, AddWarrantyForm } from "./insurance-registration-forms";
 
 function mapToDocumentItems(
   vehicleId: string,
   insurance: { id: string; provider: string; policy_number: string | null; expiry_date: string; document_url: string | null }[],
   registrations: { id: string; state: string; expiry_date: string; document_url: string | null }[],
+  warranties: { id: string; warranty_type: string; expiry_date: string | null; expiry_miles: number | null; document_url: string | null; created_at: string }[],
   emissions: { id: string; test_date: string; passed: boolean; expiry_date: string | null; document_url: string | null }[],
   vehicleDocs: { id: string; doc_type: string; title: string; document_url: string; notes: string | null; created_at: string }[],
   maintenance: { id: string; type: string; date: string; receipt_url: string | null }[]
@@ -44,6 +45,29 @@ function mapToDocumentItems(
         documentUrl: r.document_url,
         date: r.expiry_date,
         expiryDate: r.expiry_date,
+        vehicleId,
+        canDelete: true,
+      });
+    }
+  }
+
+  for (const w of warranties) {
+    if (w.document_url) {
+      const typeLabel = w.warranty_type?.replace(/_/g, " ") ?? "Warranty";
+      const subtitle = w.expiry_date
+        ? `Expires ${w.expiry_date}`
+        : w.expiry_miles
+          ? `Expires at ${w.expiry_miles.toLocaleString()} mi`
+          : typeLabel;
+      items.push({
+        id: `warr-${w.id}`,
+        source: "warranty",
+        sourceId: w.id,
+        title: typeLabel,
+        subtitle,
+        documentUrl: w.document_url,
+        date: w.expiry_date ?? w.created_at.slice(0, 10),
+        expiryDate: w.expiry_date ?? undefined,
         vehicleId,
         canDelete: true,
       });
@@ -108,12 +132,17 @@ export default async function VehicleDocumentsPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const [vehicleRes, emissionsRes, vehicleDocsRes, maintenanceRes] = await Promise.all([
+  const [vehicleRes, warrantiesRes, emissionsRes, vehicleDocsRes, maintenanceRes] = await Promise.all([
     supabase
       .from("vehicles")
       .select("id, make, model, year, insurance(*), registrations(*)")
       .eq("id", id)
       .single(),
+    supabase
+      .from("vehicle_warranties")
+      .select("id, warranty_type, expiry_date, expiry_miles, document_url, created_at")
+      .eq("vehicle_id", id)
+      .order("expiry_date", { ascending: false, nullsFirst: false }),
     supabase
       .from("vehicle_emissions")
       .select("id, test_date, passed, expiry_date, document_url")
@@ -137,6 +166,7 @@ export default async function VehicleDocumentsPage({
   const vehicle = vehicleRes.data;
   const insuranceItems = (vehicle.insurance as { id: string; provider: string; policy_number: string | null; expiry_date: string; document_url: string | null }[]) ?? [];
   const registrationItems = (vehicle.registrations as { id: string; state: string; expiry_date: string; document_url: string | null }[]) ?? [];
+  const warrantyItems = warrantiesRes.data ?? [];
   const emissionsItems = emissionsRes.data ?? [];
   const vehicleDocsItems = vehicleDocsRes.data ?? [];
   const maintenanceItems = maintenanceRes.data ?? [];
@@ -145,6 +175,7 @@ export default async function VehicleDocumentsPage({
     id,
     insuranceItems,
     registrationItems,
+    warrantyItems,
     emissionsItems,
     vehicleDocsItems,
     maintenanceItems
@@ -174,6 +205,7 @@ export default async function VehicleDocumentsPage({
           <div className="flex flex-wrap gap-4">
             <AddInsuranceForm vehicleId={id} />
             <AddRegistrationForm vehicleId={id} />
+            <AddWarrantyForm vehicleId={id} />
           </div>
           <DocumentUpload vehicleId={id} />
         </CardContent>
