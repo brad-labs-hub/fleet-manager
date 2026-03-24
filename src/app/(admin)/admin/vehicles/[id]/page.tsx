@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { VehicleDriverAssignments } from "./vehicle-driver-assignments";
+import { MaintenanceSectionList } from "./maintenance/maintenance-section-list";
 
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
@@ -367,46 +368,21 @@ export default async function AdminVehicleDetailPage({
         </CardHeader>
         <CardContent>
           {(vehicle.maintenance_records as unknown[])?.length ? (
-            <ul className="space-y-2 text-sm">
-              {(vehicle.maintenance_records as {
-                id: string;
-                type: string;
-                date: string;
-                cost: number | null;
-                status?: string | null;
-                scheduled_date?: string | null;
-                receipt_url?: string | null;
-                vendor?: string | null;
-                description?: string | null;
-              }[]).map((m) => (
-                <li key={m.id} className="flex justify-between items-center gap-2">
-                  <span className="text-foreground">
-                    <span className="capitalize">{m.type.replace(/_/g, " ")}</span>
-                    {m.vendor && <span className="text-muted-foreground"> · {m.vendor}</span>}
-                    {" — "}{formatDate(m.date)}
-                    {m.status && m.status !== "completed" && (
-                      <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-                        {m.status === "scheduled" ? "Scheduled" : "In progress"}
-                        {m.scheduled_date && ` ${formatDate(m.scheduled_date)}`}
-                      </span>
-                    )}
-                  </span>
-                  <span className="flex items-center gap-3">
-                    {m.receipt_url && (
-                      <a
-                        href={m.receipt_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline text-xs font-medium"
-                      >
-                        View doc
-                      </a>
-                    )}
-                    <span className="text-muted-foreground">{m.cost ? formatCurrency(m.cost) : "—"}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <MaintenanceSectionList
+              records={
+                vehicle.maintenance_records as {
+                  id: string;
+                  type: string;
+                  date: string;
+                  cost: number | null;
+                  status?: string | null;
+                  scheduled_date?: string | null;
+                  receipt_url?: string | null;
+                  vendor?: string | null;
+                  description?: string | null;
+                }[]
+              }
+            />
           ) : (
             <p className="text-muted-foreground">No maintenance records</p>
           )}
