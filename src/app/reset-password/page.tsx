@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,12 +10,78 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [hasSession, setHasSession] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function initFromRecoveryLink() {
+      try {
+        const url = new URL(window.location.href);
+
+        // Supabase recovery links commonly put tokens in the URL hash.
+        // We also support query-string tokens as a fallback.
+        const hashParams = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : "");
+        const queryParams = url.searchParams;
+
+        const accessToken =
+          hashParams.get("access_token") ?? queryParams.get("access_token") ?? undefined;
+        const refreshToken =
+          hashParams.get("refresh_token") ?? queryParams.get("refresh_token") ?? undefined;
+        const code = hashParams.get("code") ?? queryParams.get("code") ?? undefined;
+
+        if (code) {
+          await supabase.auth.exchangeCodeForSession(code);
+        } else if (accessToken && refreshToken) {
+          await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        }
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (cancelled) return;
+        setHasSession(!!session);
+        if (!session && !error) {
+          setError("Auth session missing. Please use a valid password reset link and try again.");
+        }
+
+        // Clean the URL so refresh links are not re-used/visible.
+        // (best-effort; ignore errors)
+        if (window.location.hash || window.location.search) {
+          url.hash = "";
+          url.search = "";
+          window.history.replaceState({}, "", url.toString());
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+        setHasSession(false);
+        // Keep this generic so the UI doesn't leak token details.
+        setError(err instanceof Error ? err.message : "Invalid or expired reset link");
+      } finally {
+        if (cancelled) return;
+        setAuthLoading(false);
+      }
+    }
+
+    initFromRecoveryLink();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (authLoading) return;
+    if (!hasSession) {
+      setError("Auth session missing. Please use a valid password reset link and try again.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -88,7 +154,7 @@ export default function ResetPasswordPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || authLoading || !hasSession}
             className="w-full py-2 bg-primary text-primary-foreground text-white rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition"
           >
             {loading ? "Updating..." : "Update password"}
