@@ -80,6 +80,28 @@ For "Forgot password?" to work, add your app URL to Supabase redirect URLs:
 1. Supabase Dashboard → **Authentication** → **URL Configuration**
 2. Add to **Redirect URLs**: `http://localhost:3000/reset-password` (and your production URL when deployed)
 
+## Email Delivery (Resend)
+
+This app relies on **Supabase Auth** to send emails for:
+- Sign ups / email confirmations
+- Password resets
+- Magic links (where used)
+- Controller invites / re-invites
+
+To use **Resend** instead of your current SMTP provider (e.g. Vercel Email), configure the email provider in the **Supabase Dashboard**:
+
+1. Supabase Dashboard → **Authentication** → **Email** (or **Providers** → **SMTP**)
+2. Select **SMTP** and enter:
+   - Host: `smtp.resend.com`
+   - Port: `587`
+   - Username: `resend`
+   - Password: your Resend API key
+3. Set the “From” email and sender name to what you want users to see.
+4. Trigger a test email (create a test user or use “Forgot password”) and verify delivery.
+
+For local Supabase (`supabase start`), the repo includes a Resend SMTP example in:
+- `supabase/config.toml` (see the `auth.email.smtp` section). Uncomment and set `RESEND_API_KEY` in your local env.
+
 ## Roles
 
 - **driver**: Add receipts, log maintenance, request cars. Sees vehicles at assigned locations.
