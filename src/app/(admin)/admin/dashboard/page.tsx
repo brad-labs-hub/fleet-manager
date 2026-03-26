@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ActivityChartCard } from "@/components/ui/activity-chart-card";
-import { DashboardStatCard } from "@/components/ui/dashboard-stat-card";
 import {
   SpendByCategoryChart,
   MonthlySpendChart,
@@ -31,10 +30,6 @@ function receiptDayKey(dateStr: string | null | undefined): string {
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
 
-  const { count: vehicleCount } = await supabase
-    .from("vehicles")
-    .select("*", { count: "exact", head: true });
-
   const ytdStart = `${new Date().getFullYear()}-01-01`;
   const { data: receiptSum } = await supabase.from("receipts").select("amount").gte("date", ytdStart);
   const totalReceipts = receiptSum?.reduce((s, r) => s + Number(r.amount), 0) ?? 0;
@@ -42,7 +37,11 @@ export default async function AdminDashboardPage() {
   const [allReceiptsRes, vehiclesForChartsRes, recentReceiptsRes, maintenanceYtdRes] =
     await Promise.all([
       supabase.from("receipts").select("amount, category, date, vehicle_id").gte("date", ytdStart),
-      supabase.from("vehicles").select("id, make, model, year"),
+      supabase
+        .from("vehicles")
+        .select("id, make, model, year, license_plate")
+        .order("make")
+        .order("model"),
       supabase.from("receipts").select("id, amount, category, date, vendor").order("created_at", { ascending: false }).limit(5),
       supabase.from("maintenance_records").select("vehicle_id, cost").gte("date", ytdStart),
     ]);
@@ -180,183 +179,247 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── KPIs: fleet size + spend (alerts in header bell) ─────────────── */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <DashboardStatCard
-          title="Vehicles"
-          value={vehicleCount ?? 0}
-          description="In fleet"
-          href="/admin/vehicles"
-          animateClassName="animate-fade-up delay-1"
-          iconWrapperClassName="bg-[var(--indigo-dim)]"
-          icon={<Car className="h-4 w-4 text-[var(--indigo-soft)]" aria-hidden />}
-        />
-        <Link
-          href="/admin/receipts"
-          className="block h-full min-h-0 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background animate-fade-up delay-2"
-        >
-          <ActivityChartCard
-            title="Spend YTD"
-            totalValue={formatCurrency(totalReceipts)}
-            data={weeklyActivityBars}
-            dropdownOptions={["Last 7 days"]}
-            trendDescription={
-              <>
-                <span className="text-muted-foreground">Last 7 days: </span>
-                <span className="font-medium text-foreground">
-                  {formatCurrency(last7ReceiptsTotal)}
-                </span>
-                <span className="text-muted-foreground"> · {spendTrendLine}</span>
-              </>
-            }
-            showTrendIcon
-            className="h-full"
-          />
-        </Link>
-      </div>
-
-      {/* ── Recent receipts (alerts → header bell) ── */}
-      <div className="max-w-2xl">
-        <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="flex items-center gap-2 text-sm font-semibold font-syne">
-              <div
-                className="flex h-6 w-6 items-center justify-center rounded-lg"
-                style={{ background: "var(--emerald-dim)" }}
-              >
-                <Receipt className="h-3.5 w-3.5" style={{ color: "var(--emerald)" }} />
-              </div>
-              Recent Receipts
-            </CardTitle>
+      {/* ── Primary grid: fleet list | spend + receipts ─────────────────── */}
+      <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+        <Card className="flex min-h-0 flex-col shadow-sm transition-shadow duration-200 hover:shadow-md animate-fade-up delay-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold font-syne">
+                <div
+                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--indigo-dim)]"
+                >
+                  <Car className="h-3.5 w-3.5 text-[var(--indigo-soft)]" aria-hidden />
+                </div>
+                Vehicles
+              </CardTitle>
+              <CardDescription className="mt-1.5">
+                {vehicles.length} in fleet · quick links
+              </CardDescription>
+            </div>
             <Link
-              href="/admin/receipts"
-              className="flex items-center gap-0.5 text-xs font-medium transition-colors hover:underline"
-              style={{ color: "var(--indigo-soft)" }}
+              href="/admin/vehicles"
+              className="flex shrink-0 items-center gap-0.5 rounded-lg text-xs font-medium text-[var(--indigo-soft)] transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
-              View all <ArrowRight className="h-3 w-3" />
+              All <ArrowRight className="h-3 w-3" />
             </Link>
           </CardHeader>
-          <CardContent className="pt-0">
-            {recentReceiptsRes.data?.length ? (
-              <ul className="space-y-1">
-                {recentReceiptsRes.data.map((r) => (
-                  <li
-                    key={r.id}
-                    className="-mx-2 flex items-center justify-between rounded-xl px-2 py-2 transition-colors hover:bg-accent"
-                  >
-                    <div>
-                      <p className="text-xs font-semibold capitalize text-foreground">
-                        {r.category?.replace(/_/g, " ")}
-                      </p>
-                      {r.vendor && (
-                        <p className="text-[11px] text-muted-foreground">{r.vendor}</p>
-                      )}
-                    </div>
-                    <div className="ml-2 shrink-0 text-right">
-                      <p className="text-xs font-bold font-syne text-foreground">
-                        {formatCurrency(Number(r.amount))}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {formatDate(r.date)}
-                      </p>
-                    </div>
+          <CardContent className="flex min-h-0 flex-1 flex-col pt-0">
+            {vehicles.length > 0 ? (
+              <ul className="grid max-h-[min(22rem,52vh)] gap-2 overflow-y-auto pr-1 sm:max-h-[min(26rem,55vh)]">
+                {vehicles.map((v) => (
+                  <li key={v.id}>
+                    <Link
+                      href={`/admin/vehicles/${v.id}`}
+                      className="flex items-center gap-3 rounded-xl border border-border/80 bg-muted/30 px-3 py-2.5 text-sm transition-colors duration-200 hover:border-border hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--indigo-dim)]">
+                        <Car className="h-4 w-4 text-[var(--indigo-soft)]" aria-hidden />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-foreground">
+                          {v.year} {v.make} {v.model}
+                        </p>
+                        {v.license_plate ? (
+                          <p className="truncate text-[11px] text-muted-foreground">
+                            {v.license_plate}
+                          </p>
+                        ) : null}
+                      </div>
+                      <ArrowRight
+                        className="h-4 w-4 shrink-0 text-muted-foreground opacity-50"
+                        aria-hidden
+                      />
+                    </Link>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="py-6 text-center">
-                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-accent">
-                  <Receipt className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <p className="mb-2 text-xs text-muted-foreground">No receipts yet</p>
+              <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border py-10 text-center">
+                <p className="text-sm text-muted-foreground">No vehicles yet</p>
                 <Link
-                  href="/admin/receipts/new"
-                  className="text-xs font-medium hover:underline"
-                  style={{ color: "var(--indigo-soft)" }}
+                  href="/admin/vehicles/new"
+                  className="mt-3 text-xs font-medium text-[var(--indigo-soft)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  Add the first one →
+                  Add your first vehicle →
                 </Link>
               </div>
             )}
           </CardContent>
         </Card>
+
+        <div className="flex min-h-0 flex-col gap-4">
+          <Link
+            href="/admin/receipts"
+            className="block min-h-0 flex-1 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background animate-fade-up delay-2"
+          >
+            <ActivityChartCard
+              title="Spend YTD"
+              totalValue={formatCurrency(totalReceipts)}
+              data={weeklyActivityBars}
+              dropdownOptions={["Last 7 days"]}
+              trendDescription={
+                <>
+                  <span className="text-muted-foreground">Last 7 days: </span>
+                  <span className="font-medium text-foreground">
+                    {formatCurrency(last7ReceiptsTotal)}
+                  </span>
+                  <span className="text-muted-foreground"> · {spendTrendLine}</span>
+                </>
+              }
+              showTrendIcon
+              className="h-full min-h-[14rem]"
+            />
+          </Link>
+
+          <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md animate-fade-up delay-3">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold font-syne">
+                <div
+                  className="flex h-6 w-6 items-center justify-center rounded-lg"
+                  style={{ background: "var(--emerald-dim)" }}
+                >
+                  <Receipt className="h-3.5 w-3.5" style={{ color: "var(--emerald)" }} />
+                </div>
+                Recent Receipts
+              </CardTitle>
+              <Link
+                href="/admin/receipts"
+                className="flex items-center gap-0.5 text-xs font-medium transition-colors hover:underline"
+                style={{ color: "var(--indigo-soft)" }}
+              >
+                View all <ArrowRight className="h-3 w-3" />
+              </Link>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {recentReceiptsRes.data?.length ? (
+                <ul className="max-h-[min(16rem,40vh)] space-y-1 overflow-y-auto pr-1">
+                  {recentReceiptsRes.data.map((r) => (
+                    <li
+                      key={r.id}
+                      className="-mx-2 flex items-center justify-between rounded-xl px-2 py-2 transition-colors hover:bg-accent"
+                    >
+                      <div>
+                        <p className="text-xs font-semibold capitalize text-foreground">
+                          {r.category?.replace(/_/g, " ")}
+                        </p>
+                        {r.vendor && (
+                          <p className="text-[11px] text-muted-foreground">{r.vendor}</p>
+                        )}
+                      </div>
+                      <div className="ml-2 shrink-0 text-right">
+                        <p className="text-xs font-bold font-syne text-foreground">
+                          {formatCurrency(Number(r.amount))}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {formatDate(r.date)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="py-6 text-center">
+                  <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-accent">
+                    <Receipt className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <p className="mb-2 text-xs text-muted-foreground">No receipts yet</p>
+                  <Link
+                    href="/admin/receipts/new"
+                    className="text-xs font-medium hover:underline"
+                    style={{ color: "var(--indigo-soft)" }}
+                  >
+                    Add the first one →
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* ── Analytics ─────────────────────────────────── */}
-      <div className="flex items-center gap-3 pt-1">
-        <h2 className="text-base font-bold font-syne text-foreground whitespace-nowrap">Analytics</h2>
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <span className="text-xs text-muted-foreground whitespace-nowrap">Year to date</span>
+      {/* ── Analytics + fuel: single grid ─────────────────────────────── */}
+      <div className="grid gap-4 lg:gap-5">
+        <div className="flex items-center gap-3 pt-1">
+          <h2 className="whitespace-nowrap font-syne text-base font-bold text-foreground">
+            Analytics
+          </h2>
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="whitespace-nowrap text-xs text-muted-foreground">Year to date</span>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold font-syne">Spend by Category</CardTitle>
+              <CardDescription>All categories</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SpendByCategoryChart data={categoryData} />
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold font-syne">Monthly Spend</CardTitle>
+              <CardDescription>Last 6 months</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MonthlySpendChart data={monthlyData} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {vehicleData.length > 0 && (
+          <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold font-syne">
+                Top Vehicles by Total Spend
+              </CardTitle>
+              <CardDescription>Receipts + maintenance, year to date</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PerVehicleChart data={vehicleData} />
+            </CardContent>
+          </Card>
+        )}
+
+        {(fuelVehicleData.length > 0 || fuelMonthlyData.some((d) => d.total > 0)) && (
+          <>
+            <div className="flex items-center gap-3 pt-1">
+              <h2 className="whitespace-nowrap font-syne text-base font-bold text-foreground">
+                Fuel
+              </h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+              <span className="whitespace-nowrap text-xs text-muted-foreground">
+                Gas receipts, YTD / last 6 months
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {fuelMonthlyData.some((d) => d.total > 0) && (
+                <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-bold font-syne">Fuel by month</CardTitle>
+                    <CardDescription>Last 6 months</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <MonthlySpendChart data={fuelMonthlyData} />
+                  </CardContent>
+                </Card>
+              )}
+              {fuelVehicleData.length > 0 && (
+                <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-bold font-syne">Fuel by vehicle</CardTitle>
+                    <CardDescription>Year to date</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <PerVehicleChart data={fuelVehicleData} />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </>
+        )}
       </div>
-
-      <div className="grid gap-5 md:grid-cols-2">
-        <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold font-syne">Spend by Category</CardTitle>
-            <CardDescription>All categories</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SpendByCategoryChart data={categoryData} />
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold font-syne">Monthly Spend</CardTitle>
-            <CardDescription>Last 6 months</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <MonthlySpendChart data={monthlyData} />
-          </CardContent>
-        </Card>
-      </div>
-
-      {vehicleData.length > 0 && (
-        <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold font-syne">
-              Top Vehicles by Total Spend
-            </CardTitle>
-            <CardDescription>Receipts + maintenance, year to date</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <PerVehicleChart data={vehicleData} />
-          </CardContent>
-        </Card>
-      )}
-
-      {(fuelVehicleData.length > 0 || fuelMonthlyData.some((d) => d.total > 0)) && (
-        <>
-          <div className="flex items-center gap-3 pt-2">
-            <h2 className="text-base font-bold font-syne text-foreground whitespace-nowrap">Fuel</h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-            <span className="text-xs text-muted-foreground whitespace-nowrap">Gas receipts, YTD / last 6 months</span>
-          </div>
-          <div className="grid gap-5 md:grid-cols-2">
-            {fuelMonthlyData.some((d) => d.total > 0) && (
-              <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold font-syne">Fuel by month</CardTitle>
-                  <CardDescription>Last 6 months</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <MonthlySpendChart data={fuelMonthlyData} />
-                </CardContent>
-              </Card>
-            )}
-            {fuelVehicleData.length > 0 && (
-              <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold font-syne">Fuel by vehicle</CardTitle>
-                  <CardDescription>Year to date</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <PerVehicleChart data={fuelVehicleData} />
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </>
-      )}
     </div>
   );
 }
