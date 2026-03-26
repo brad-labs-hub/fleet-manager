@@ -20,6 +20,21 @@ function formatCategory(cat: string) {
   return cat.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+/** Bar chart axis ticks: show dollars under 1k, else compact `$2.5k` style (not `$0k` for sub-500 ticks). */
+function formatAxisSpend(v: unknown): string {
+  const n = typeof v === "number" ? v : Number(v);
+  if (!Number.isFinite(n)) return "";
+  if (n === 0) return "$0";
+  const abs = Math.abs(n);
+  if (abs < 1000) return `$${Math.round(n)}`;
+  const k = n / 1000;
+  if (abs < 10_000) {
+    const t = Math.round(k * 10) / 10;
+    return t % 1 === 0 ? `$${t}k` : `$${t.toFixed(1)}k`;
+  }
+  return `$${Math.round(k)}k`;
+}
+
 /** Card-style tooltip for spend-by-category (readable in light and dark). */
 function SpendCategoryTooltipContent({
   active,
@@ -122,7 +137,7 @@ export function MonthlySpendChart({ data }: { data: MonthlyData[] }) {
       <BarChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-        <YAxis tickFormatter={(v) => `$${(Number(v) / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+        <YAxis tickFormatter={formatAxisSpend} tick={{ fontSize: 11 }} />
         <Tooltip formatter={(value) => formatCurrency(Number(value))} />
         <Bar
           dataKey="total"
@@ -143,7 +158,7 @@ export function PerVehicleChart({ data }: { data: VehicleData[] }) {
     <ResponsiveContainer width="100%" height={Math.max(data.length * 36 + 20, 120)}>
       <BarChart data={data} layout="vertical" margin={{ top: 4, right: 80, left: 8, bottom: 4 }}>
         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-        <XAxis type="number" tickFormatter={(v) => `$${(Number(v) / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+        <XAxis type="number" tickFormatter={formatAxisSpend} tick={{ fontSize: 11 }} />
         <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 11 }} />
         <Tooltip formatter={(value) => formatCurrency(Number(value))} />
         <Bar
