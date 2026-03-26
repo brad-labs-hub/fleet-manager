@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cursor UI/UX Pro Max skill (Python search scripts)
+.cursor/skills/**/__pycache__/
