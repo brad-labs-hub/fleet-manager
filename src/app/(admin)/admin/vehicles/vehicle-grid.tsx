@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { VehicleImage } from "@/components/vehicle-image";
+import { HolographicCard } from "@/components/ui/holographic-card";
+import { cn } from "@/lib/utils";
 
 type Location = { id: string; name: string };
 
@@ -191,12 +193,11 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
   const isInactive = INACTIVE_STATUSES.has(status);
 
   return (
-    <Link href={`/admin/vehicles/${v.id}`}>
-      <div
-        className={`group rounded-xl border border-border bg-card overflow-hidden hover:border-primary/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${
-          isInactive ? "opacity-60" : ""
-        }`}
-      >
+    <Link
+      href={`/admin/vehicles/${v.id}`}
+      className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      <HolographicCard className={cn("overflow-hidden", isInactive && "opacity-60")}>
         {/* Image panel */}
         <div className="relative aspect-[16/10] bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
           <VehicleImage
@@ -245,7 +246,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
             </p>
           )}
         </div>
-      </div>
+      </HolographicCard>
     </Link>
   );
 }
