@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="relative z-10 space-y-6">
 
       {/* ── Header ────────────────────────────────────── */}
       <div className="flex items-start justify-between flex-wrap gap-3 animate-fade-up">
@@ -116,14 +116,20 @@ export default async function AdminDashboardPage() {
           <p className="text-sm text-muted-foreground mt-0.5">{todayLabel}</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/admin/receipts/new">
-            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium text-foreground transition-all">
+          <Link
+            href="/admin/receipts/new"
+            className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium text-foreground transition-colors duration-200 cursor-pointer">
               <Plus className="h-3.5 w-3.5" />
               Add Receipt
             </button>
           </Link>
-          <Link href="/admin/vehicles/new">
-            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-medium shadow-indigo-sm hover:shadow-indigo transition-all">
+          <Link
+            href="/admin/vehicles/new"
+            className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-medium shadow-indigo-sm hover:shadow-indigo transition-shadow duration-200 cursor-pointer">
               <Plus className="h-3.5 w-3.5" />
               Add Vehicle
             </button>
@@ -134,8 +140,11 @@ export default async function AdminDashboardPage() {
       {/* ── KPI stat cards ─────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Vehicles */}
-        <Link href="/admin/vehicles" className="block animate-fade-up delay-1">
-          <div className="relative overflow-hidden rounded-2xl bg-card border border-[rgba(99,102,241,0.2)] border-t-2 border-t-[var(--indigo)] p-5 hover:border-[rgba(99,102,241,0.35)] transition-all group cursor-pointer">
+        <Link
+          href="/admin/vehicles"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background animate-fade-up delay-1"
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-card border border-[rgba(99,102,241,0.2)] border-t-2 border-t-[var(--indigo)] p-5 shadow-sm hover:shadow-md hover:border-[rgba(99,102,241,0.35)] transition-shadow duration-200 group cursor-pointer">
             <div className="absolute top-0 right-0 w-24 h-24 rounded-full pointer-events-none"
               style={{ background: "radial-gradient(circle, var(--indigo-glow), transparent 70%)", transform: "translate(30%, -30%)" }} />
             <div className="flex items-center justify-between mb-3">
@@ -150,8 +159,11 @@ export default async function AdminDashboardPage() {
         </Link>
 
         {/* Total Spend */}
-        <Link href="/admin/receipts" className="block animate-fade-up delay-2">
-          <div className="relative overflow-hidden rounded-2xl bg-card border border-[rgba(16,185,129,0.2)] border-t-2 border-t-[var(--emerald)] p-5 hover:border-[rgba(16,185,129,0.35)] transition-all cursor-pointer">
+        <Link
+          href="/admin/receipts"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background animate-fade-up delay-2"
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-card border border-[rgba(16,185,129,0.2)] border-t-2 border-t-[var(--emerald)] p-5 shadow-sm hover:shadow-md hover:border-[rgba(16,185,129,0.35)] transition-shadow duration-200 cursor-pointer">
             <div className="absolute top-0 right-0 w-24 h-24 rounded-full pointer-events-none"
               style={{ background: "radial-gradient(circle, var(--emerald-dim), transparent 70%)", transform: "translate(30%, -30%)" }} />
             <div className="flex items-center justify-between mb-3">
@@ -166,8 +178,11 @@ export default async function AdminDashboardPage() {
         </Link>
 
         {/* Alerts */}
-        <Link href="/admin/vehicles" className="block animate-fade-up delay-3">
-          <div className={`relative overflow-hidden rounded-2xl bg-card border-t-2 p-5 transition-all cursor-pointer ${
+        <Link
+          href="/admin/vehicles"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background animate-fade-up delay-3"
+        >
+          <div className={`relative overflow-hidden rounded-2xl bg-card border-t-2 p-5 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer ${
             alerts.length > 0
               ? "border border-[rgba(249,115,22,0.2)] border-t-[var(--amber)] hover:border-[rgba(249,115,22,0.35)]"
               : "border border-border border-t-muted"
@@ -189,7 +204,7 @@ export default async function AdminDashboardPage() {
         </Link>
 
         {/* Insurance */}
-        <div className={`relative overflow-hidden rounded-2xl bg-card border-t-2 p-5 transition-all animate-fade-up delay-4 ${
+        <div className={`relative overflow-hidden rounded-2xl bg-card border-t-2 p-5 shadow-sm hover:shadow-md transition-shadow duration-200 animate-fade-up delay-4 ${
           expiringInsurance.length > 0
             ? "border border-[rgba(244,63,94,0.2)] border-t-[var(--rose)]"
             : "border border-border border-t-muted"
@@ -212,16 +227,22 @@ export default async function AdminDashboardPage() {
 
       {/* ── Quick actions ──────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 animate-fade-up delay-3">
-        <Link href="/admin/receipts/new">
-          <div className="rounded-2xl p-4 flex items-center gap-3 cursor-pointer transition-all bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-sm hover:shadow-indigo group">
+        <Link
+          href="/admin/receipts/new"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          <div className="rounded-2xl p-4 flex items-center gap-3 cursor-pointer transition-shadow duration-200 bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-sm hover:shadow-indigo group">
             <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
               <Receipt className="h-4 w-4 text-white" />
             </div>
             <p className="text-sm font-semibold text-white">New Receipt</p>
           </div>
         </Link>
-        <Link href="/admin/requests">
-          <div className="rounded-2xl p-4 flex items-center gap-3 cursor-pointer bg-card border border-border hover:border-[var(--border-hi)] transition-all">
+        <Link
+          href="/admin/requests"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          <div className="rounded-2xl p-4 flex items-center gap-3 cursor-pointer bg-card border border-border shadow-sm hover:shadow-md hover:border-[var(--border-hi)] transition-shadow duration-200">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(124,58,237,0.12)" }}>
               <ClipboardList className="h-4 w-4 text-violet-400" />
             </div>
@@ -233,7 +254,7 @@ export default async function AdminDashboardPage() {
       {/* ── Alerts + Recent receipts ────────────────────── */}
       <div className="grid md:grid-cols-3 gap-5">
         {/* Expiring Insurance */}
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold font-syne text-foreground flex items-center gap-2 text-sm">
               <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--rose-dim)" }}>
@@ -273,7 +294,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Maintenance Alerts */}
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold font-syne text-foreground flex items-center gap-2 text-sm">
               <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--amber-dim)" }}>
@@ -312,7 +333,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Recent Receipts */}
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold font-syne text-foreground flex items-center gap-2 text-sm">
               <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--emerald-dim)" }}>
@@ -356,17 +377,17 @@ export default async function AdminDashboardPage() {
       {/* ── Analytics ─────────────────────────────────── */}
       <div className="flex items-center gap-3 pt-1">
         <h2 className="text-base font-bold font-syne text-foreground whitespace-nowrap">Analytics</h2>
-        <div className="flex-1 h-px bg-border" />
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <span className="text-xs text-muted-foreground whitespace-nowrap">Year to date</span>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
           <p className="text-sm font-bold font-syne text-foreground mb-1">Spend by Category</p>
           <p className="text-xs text-muted-foreground mb-4">All categories</p>
           <SpendByCategoryChart data={categoryData} />
         </div>
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
           <p className="text-sm font-bold font-syne text-foreground mb-1">Monthly Spend</p>
           <p className="text-xs text-muted-foreground mb-4">Last 6 months</p>
           <MonthlySpendChart data={monthlyData} />
@@ -374,7 +395,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {vehicleData.length > 0 && (
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
           <p className="text-sm font-bold font-syne text-foreground mb-1">Top Vehicles by Total Spend</p>
           <p className="text-xs text-muted-foreground mb-4">Receipts + maintenance, year to date</p>
           <PerVehicleChart data={vehicleData} />
@@ -385,19 +406,19 @@ export default async function AdminDashboardPage() {
         <>
           <div className="flex items-center gap-3 pt-2">
             <h2 className="text-base font-bold font-syne text-foreground whitespace-nowrap">Fuel</h2>
-            <div className="flex-1 h-px bg-border" />
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             <span className="text-xs text-muted-foreground whitespace-nowrap">Gas receipts, YTD / last 6 months</span>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
             {fuelMonthlyData.some((d) => d.total > 0) && (
-              <div className="rounded-2xl bg-card border border-border p-5">
+              <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <p className="text-sm font-bold font-syne text-foreground mb-1">Fuel by month</p>
                 <p className="text-xs text-muted-foreground mb-4">Last 6 months</p>
                 <MonthlySpendChart data={fuelMonthlyData} />
               </div>
             )}
             {fuelVehicleData.length > 0 && (
-              <div className="rounded-2xl bg-card border border-border p-5">
+              <div className="rounded-2xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <p className="text-sm font-bold font-syne text-foreground mb-1">Fuel by vehicle</p>
                 <p className="text-xs text-muted-foreground mb-4">Year to date</p>
                 <PerVehicleChart data={fuelVehicleData} />
