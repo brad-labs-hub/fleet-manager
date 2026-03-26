@@ -5,7 +5,27 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  AdminAlertsBell,
+  type AdminBellInsuranceItem,
+  type AdminBellMaintenanceItem,
+} from "@/components/admin-alerts-bell";
 import { AdminNav } from "./admin-nav";
+
+function normalizeVehicle(
+  raw: unknown
+): AdminBellInsuranceItem["vehicle"] {
+  if (!raw || typeof raw !== "object") return null;
+  const v = raw as Record<string, unknown>;
+  const id = typeof v.id === "string" ? v.id : null;
+  if (!id) return null;
+  return {
+    id,
+    make: String(v.make ?? ""),
+    model: String(v.model ?? ""),
+    year: typeof v.year === "number" ? v.year : Number(v.year) || 0,
+  };
+}
 
 export default async function AdminLayout({
   children,
@@ -27,6 +47,61 @@ export default async function AdminLayout({
   const role = profile?.role ?? "driver";
   const isAdmin = role === "controller" || role === "employee";
   if (!isAdmin) redirect("/driver/dashboard");
+
+  const in90Days = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
+
+  const [
+    expiringInsuranceRes,
+    maintenanceAlertsRes,
+    insuranceCountRes,
+    maintenanceAlertsCountRes,
+  ] = await Promise.all([
+    supabase
+      .from("insurance")
+      .select("id, expiry_date, vehicle_id, vehicle:vehicles(id, make, model, year)")
+      .lte("expiry_date", in90Days)
+      .gte("expiry_date", today)
+      .order("expiry_date")
+      .limit(50),
+    supabase
+      .from("maintenance_alerts")
+      .select("id, alert_type, due_date, vehicle_id, vehicle:vehicles(id, make, model, year)")
+      .eq("dismissed", false)
+      .order("due_date")
+      .limit(50),
+    supabase
+      .from("insurance")
+      .select("*", { count: "exact", head: true })
+      .lte("expiry_date", in90Days)
+      .gte("expiry_date", today),
+    supabase
+      .from("maintenance_alerts")
+      .select("*", { count: "exact", head: true })
+      .eq("dismissed", false),
+  ]);
+
+  const alertsBellTotal =
+    (insuranceCountRes.count ?? 0) + (maintenanceAlertsCountRes.count ?? 0);
+
+  const bellInsurance: AdminBellInsuranceItem[] = (
+    expiringInsuranceRes.data ?? []
+  ).map((row) => ({
+    id: row.id,
+    expiry_date: row.expiry_date,
+    vehicle: normalizeVehicle(row.vehicle),
+  }));
+
+  const bellMaintenance: AdminBellMaintenanceItem[] = (
+    maintenanceAlertsRes.data ?? []
+  ).map((row) => ({
+    id: row.id,
+    alert_type: row.alert_type,
+    due_date: row.due_date,
+    vehicle: normalizeVehicle(row.vehicle),
+  }));
 
   async function signOut() {
     "use server";
@@ -60,7 +135,12 @@ export default async function AdminLayout({
               Driver View
             </Link>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
+            <AdminAlertsBell
+              insurance={bellInsurance}
+              maintenance={bellMaintenance}
+              totalCount={alertsBellTotal}
+            />
             <ThemeToggle />
             <form action={signOut}>
               <button

@@ -45,24 +45,31 @@ export default async function AdminDashboardPage() {
   const in90Days = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const today = new Date().toISOString().slice(0, 10);
 
-  const [expiringInsuranceRes, alertsRes, allReceiptsRes, vehiclesForChartsRes, recentReceiptsRes, maintenanceYtdRes] =
-    await Promise.all([
-      supabase
-        .from("insurance")
-        .select("id, expiry_date, vehicle_id, vehicle:vehicles(id, make, model, year)")
-        .lte("expiry_date", in90Days).gte("expiry_date", today).order("expiry_date").limit(5),
-      supabase
-        .from("maintenance_alerts")
-        .select("id, alert_type, due_date, vehicle_id, vehicle:vehicles(id, make, model, year)")
-        .eq("dismissed", false).order("due_date").limit(5),
-      supabase.from("receipts").select("amount, category, date, vehicle_id").gte("date", ytdStart),
-      supabase.from("vehicles").select("id, make, model, year"),
-      supabase.from("receipts").select("id, amount, category, date, vendor").order("created_at", { ascending: false }).limit(5),
-      supabase.from("maintenance_records").select("vehicle_id, cost").gte("date", ytdStart),
-    ]);
+  const [
+    insuranceCountRes,
+    maintenanceAlertsCountRes,
+    allReceiptsRes,
+    vehiclesForChartsRes,
+    recentReceiptsRes,
+    maintenanceYtdRes,
+  ] = await Promise.all([
+    supabase
+      .from("insurance")
+      .select("*", { count: "exact", head: true })
+      .lte("expiry_date", in90Days)
+      .gte("expiry_date", today),
+    supabase
+      .from("maintenance_alerts")
+      .select("*", { count: "exact", head: true })
+      .eq("dismissed", false),
+    supabase.from("receipts").select("amount, category, date, vehicle_id").gte("date", ytdStart),
+    supabase.from("vehicles").select("id, make, model, year"),
+    supabase.from("receipts").select("id, amount, category, date, vendor").order("created_at", { ascending: false }).limit(5),
+    supabase.from("maintenance_records").select("vehicle_id, cost").gte("date", ytdStart),
+  ]);
 
-  const expiringInsurance = expiringInsuranceRes.data ?? [];
-  const alerts = alertsRes.data ?? [];
+  const expiringInsuranceCount = insuranceCountRes.count ?? 0;
+  const maintenanceAlertsCount = maintenanceAlertsCountRes.count ?? 0;
   const allReceipts = allReceiptsRes.data ?? [];
 
   // Analytics
@@ -231,19 +238,21 @@ export default async function AdminDashboardPage() {
         </Link>
         <DashboardStatCard
           title="Alerts"
-          value={alerts.length}
-          description={alerts.length === 0 ? "All clear" : "Need attention"}
+          value={maintenanceAlertsCount}
+          description={maintenanceAlertsCount === 0 ? "All clear" : "Open maintenance items"}
           href="/admin/vehicles"
           animateClassName="animate-fade-up delay-3"
           iconWrapperClassName={
-            alerts.length > 0 ? "bg-[var(--amber-dim)]" : "bg-muted"
+            maintenanceAlertsCount > 0 ? "bg-[var(--amber-dim)]" : "bg-muted"
           }
           icon={
             <AlertTriangle
               className="h-4 w-4"
               style={{
                 color:
-                  alerts.length > 0 ? "var(--amber)" : "var(--muted-foreground)",
+                  maintenanceAlertsCount > 0
+                    ? "var(--amber)"
+                    : "var(--muted-foreground)",
               }}
               aria-hidden
             />
@@ -251,22 +260,22 @@ export default async function AdminDashboardPage() {
         />
         <DashboardStatCard
           title="Insurance"
-          value={expiringInsurance.length}
+          value={expiringInsuranceCount}
           description={
-            expiringInsurance.length === 0
+            expiringInsuranceCount === 0
               ? "All current"
               : "Expiring in 90 days"
           }
           animateClassName="animate-fade-up delay-4"
           iconWrapperClassName={
-            expiringInsurance.length > 0 ? "bg-[var(--rose-dim)]" : "bg-muted"
+            expiringInsuranceCount > 0 ? "bg-[var(--rose-dim)]" : "bg-muted"
           }
           icon={
             <Shield
               className="h-4 w-4"
               style={{
                 color:
-                  expiringInsurance.length > 0
+                  expiringInsuranceCount > 0
                     ? "var(--rose)"
                     : "var(--muted-foreground)",
               }}
@@ -302,121 +311,8 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      {/* ── Alerts + Recent receipts ────────────────────── */}
-      <div className="grid gap-5 md:grid-cols-3">
-        <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="flex items-center gap-2 text-sm font-semibold font-syne">
-              <div
-                className="flex h-6 w-6 items-center justify-center rounded-lg"
-                style={{ background: "var(--rose-dim)" }}
-              >
-                <Shield className="h-3.5 w-3.5" style={{ color: "var(--rose)" }} />
-              </div>
-              Expiring Insurance
-            </CardTitle>
-            <span className="text-xs text-muted-foreground">90 days</span>
-          </CardHeader>
-          <CardContent className="pt-0">
-            {expiringInsurance.length ? (
-              <ul className="space-y-1">
-                {expiringInsurance.map((i) => {
-                  const v = i.vehicle as unknown as {
-                    id: string;
-                    make: string;
-                    model: string;
-                    year: number;
-                  } | null;
-                  return (
-                    <li key={i.id}>
-                      <Link
-                        href={v ? `/admin/vehicles/${v.id}` : "#"}
-                        className="group -mx-2 flex items-center justify-between rounded-xl px-2 py-2 text-sm transition-colors hover:bg-accent"
-                      >
-                        <span className="mr-2 truncate text-xs font-medium text-foreground group-hover:text-primary">
-                          {v ? `${v.year} ${v.make} ${v.model}` : "Unknown"}
-                        </span>
-                        <span
-                          className="shrink-0 whitespace-nowrap text-xs font-semibold"
-                          style={{ color: "var(--rose)" }}
-                        >
-                          {formatDate(i.expiry_date)}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <div className="py-6 text-center">
-                <div
-                  className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: "var(--emerald-dim)" }}
-                >
-                  <Shield className="h-5 w-5" style={{ color: "var(--emerald)" }} />
-                </div>
-                <p className="text-xs text-muted-foreground">All policies current</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-sm font-semibold font-syne">
-              <div
-                className="flex h-6 w-6 items-center justify-center rounded-lg"
-                style={{ background: "var(--amber-dim)" }}
-              >
-                <AlertTriangle className="h-3.5 w-3.5" style={{ color: "var(--amber)" }} />
-              </div>
-              Maintenance Alerts
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            {alerts.length ? (
-              <ul className="space-y-1">
-                {alerts.map((a) => {
-                  const v = a.vehicle as unknown as {
-                    id: string;
-                    make: string;
-                    model: string;
-                    year: number;
-                  } | null;
-                  return (
-                    <li key={a.id}>
-                      <Link
-                        href={v ? `/admin/vehicles/${v.id}/alerts` : "#"}
-                        className="group -mx-2 flex items-center justify-between rounded-xl px-2 py-2 text-sm transition-colors hover:bg-accent"
-                      >
-                        <span className="mr-2 truncate text-xs font-medium text-foreground group-hover:text-primary">
-                          {v ? `${v.year} ${v.make} ${v.model}` : "Unknown"}
-                        </span>
-                        <span
-                          className="shrink-0 whitespace-nowrap text-xs font-semibold"
-                          style={{ color: "var(--amber)" }}
-                        >
-                          {a.due_date ? formatDate(a.due_date) : a.alert_type}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <div className="py-6 text-center">
-                <div
-                  className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: "var(--emerald-dim)" }}
-                >
-                  <AlertTriangle className="h-5 w-5" style={{ color: "var(--emerald)" }} />
-                </div>
-                <p className="text-xs text-muted-foreground">No pending alerts</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
+      {/* ── Recent receipts (insurance & maintenance → header bell) ── */}
+      <div className="max-w-2xl">
         <Card className="shadow-sm transition-shadow duration-200 hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold font-syne">
