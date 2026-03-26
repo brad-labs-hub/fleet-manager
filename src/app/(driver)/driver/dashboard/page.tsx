@@ -28,14 +28,20 @@ export default async function DriverDashboardPage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
-        <Link href="/driver/receipts/new">
-          <div className="rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 h-24 cursor-pointer transition-all bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-sm hover:shadow-indigo">
+        <Link
+          href="/driver/receipts/new"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          <div className="rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 h-24 cursor-pointer transition-shadow duration-200 bg-gradient-to-br from-indigo-500 to-violet-600 shadow-indigo-sm hover:shadow-indigo">
             <Receipt className="h-5 w-5 text-white" />
             <p className="text-sm font-semibold text-white">New Receipt</p>
           </div>
         </Link>
-        <Link href="/driver/requests/new">
-          <div className="rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 h-24 cursor-pointer bg-card border border-border hover:border-[var(--border-hi)] transition-all">
+        <Link
+          href="/driver/requests/new"
+          className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          <div className="rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 h-24 cursor-pointer bg-card border border-border hover:border-[var(--border-hi)] transition-colors duration-200">
             <Wrench className="h-5 w-5" style={{ color: "var(--indigo-soft)" }} />
             <p className="text-sm font-semibold text-foreground">Request a Car</p>
           </div>
@@ -58,7 +64,7 @@ export default async function DriverDashboardPage() {
                 <Link
                   key={a.id}
                   href={v ? `/driver/vehicles/${v.id}` : "#"}
-                  className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl text-sm border-b border-border last:border-0 hover:bg-accent transition-colors"
+                  className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl text-sm border-b border-border last:border-0 hover:bg-accent cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <span className="text-foreground text-xs font-medium">
                     {v ? `${v.make} ${v.model}` : "—"}
@@ -82,15 +88,22 @@ export default async function DriverDashboardPage() {
             </div>
             Recent Receipts
           </h2>
-          <Link href="/driver/receipts" className="flex items-center gap-0.5 text-xs font-medium" style={{ color: "var(--indigo-soft)" }}>
+          <Link
+            href="/driver/receipts"
+            className="flex items-center gap-0.5 text-xs font-medium cursor-pointer rounded-md outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            style={{ color: "var(--indigo-soft)" }}
+          >
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
         {recentReceipts && recentReceipts.length > 0 ? (
           <div className="space-y-1">
             {recentReceipts.map((r) => (
-              <Link key={r.id} href={`/driver/receipts/${r.id}`}
-                className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl hover:bg-accent transition-colors">
+              <Link
+                key={r.id}
+                href={`/driver/receipts/${r.id}`}
+                className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl hover:bg-accent cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
                 <span className="text-xs font-medium text-foreground capitalize">{r.category?.replace(/_/g, " ")}</span>
                 <span className="text-xs font-bold text-foreground">{formatCurrency(Number(r.amount))}</span>
               </Link>
@@ -99,7 +112,11 @@ export default async function DriverDashboardPage() {
         ) : (
           <div className="py-4 text-center">
             <p className="text-sm text-muted-foreground mb-2">No receipts yet</p>
-            <Link href="/driver/receipts/new" className="text-xs font-medium" style={{ color: "var(--indigo-soft)" }}>
+            <Link
+              href="/driver/receipts/new"
+              className="text-xs font-medium cursor-pointer rounded-md outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              style={{ color: "var(--indigo-soft)" }}
+            >
               Add your first receipt →
             </Link>
           </div>
@@ -115,15 +132,22 @@ export default async function DriverDashboardPage() {
             </div>
             Fleet Overview
           </h2>
-          <Link href="/driver/vehicles" className="flex items-center gap-0.5 text-xs font-medium" style={{ color: "var(--indigo-soft)" }}>
+          <Link
+            href="/driver/vehicles"
+            className="flex items-center gap-0.5 text-xs font-medium cursor-pointer rounded-md outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            style={{ color: "var(--indigo-soft)" }}
+          >
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
         {vehicles && vehicles.length > 0 ? (
           <div className="space-y-1">
             {vehicles.slice(0, 5).map((v) => (
-              <Link key={v.id} href={`/driver/vehicles/${v.id}`}
-                className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl hover:bg-accent transition-colors">
+              <Link
+                key={v.id}
+                href={`/driver/vehicles/${v.id}`}
+                className="flex justify-between items-center py-2 px-2 -mx-2 rounded-xl hover:bg-accent cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
                 <span className="text-xs font-medium text-foreground">
                   {v.year} {v.make} {v.model}
                 </span>

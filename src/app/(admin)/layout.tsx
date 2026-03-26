@@ -40,7 +40,10 @@ export default async function AdminLayout({
       <header className="sticky top-0 z-10 border-b border-border px-4 py-2.5 bg-card/80 backdrop-blur-xl">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <Link href="/admin/dashboard" className="flex items-center gap-2.5">
+            <Link
+              href="/admin/dashboard"
+              className="flex items-center gap-2.5 cursor-pointer rounded-xl outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
               <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-indigo-sm shrink-0">
                 <span className="text-white text-xs font-bold font-syne tracking-wide">FM</span>
               </div>
@@ -52,7 +55,7 @@ export default async function AdminLayout({
             <div className="h-5 w-px bg-border mx-1" />
             <Link
               href="/driver/dashboard"
-              className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-2.5 py-1 transition-colors hover:border-primary/30"
+              className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-2.5 py-1 cursor-pointer transition-colors duration-200 hover:border-primary/30 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Driver View
             </Link>
@@ -62,7 +65,7 @@ export default async function AdminLayout({
             <form action={signOut}>
               <button
                 type="submit"
-                className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label="Sign out"
               >
                 <LogOut className="h-4 w-4" />

@@ -51,10 +51,10 @@ function LoginForm() {
 
         {/* Brand */}
         <div className="text-center mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-white font-bold text-base tracking-tight">FM</span>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+            <span className="text-white font-bold font-syne text-base tracking-tight">FM</span>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight leading-none">
+          <h1 className="text-2xl font-extrabold font-syne tracking-tight leading-none">
             <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">Fleet</span>
             <span className="text-foreground ml-1.5">Manager</span>
           </h1>
@@ -85,7 +85,7 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2.5 border border-input rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent bg-background text-sm"
+              className="w-full px-4 py-2.5 border border-input rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background focus:border-transparent bg-background text-sm transition-shadow duration-200"
               placeholder="you@company.com"
             />
           </div>
@@ -94,7 +94,10 @@ function LoginForm() {
               <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Password
               </label>
-              <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors duration-200 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -104,13 +107,13 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2.5 border border-input rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent bg-background text-sm"
+              className="w-full px-4 py-2.5 border border-input rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background focus:border-transparent bg-background text-sm transition-shadow duration-200"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-xl font-medium text-sm transition-all disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl font-medium text-sm cursor-pointer transition-opacity duration-200 hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
             style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)", color: "#fff" }}
           >
             {loading ? "Signing in…" : "Sign In"}
@@ -118,7 +121,10 @@ function LoginForm() {
         </form>
 
         <p className="text-center text-xs text-muted-foreground">
-          <Link href="/forgot-password" className="hover:text-foreground underline underline-offset-2">
+          <Link
+            href="/forgot-password"
+            className="hover:text-foreground underline underline-offset-2 cursor-pointer transition-colors duration-200 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
             Forgot your password?
           </Link>
         </p>

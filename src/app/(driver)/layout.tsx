@@ -34,7 +34,10 @@ export default async function DriverLayout({
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
-          <Link href="/driver/dashboard" className="flex items-center gap-2.5">
+          <Link
+            href="/driver/dashboard"
+            className="flex items-center gap-2.5 cursor-pointer rounded-xl outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
             <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-indigo-sm shrink-0">
               <span className="text-white text-[10px] font-bold tracking-wide">FM</span>
             </div>
@@ -44,7 +47,7 @@ export default async function DriverLayout({
             {isAdmin && (
               <Link
                 href="/admin/dashboard"
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer rounded-lg px-1 -mx-1 py-0.5 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Admin
@@ -54,7 +57,7 @@ export default async function DriverLayout({
             <form action={signOut}>
             <button
               type="submit"
-              className="p-2 text-muted-foreground hover:text-foreground"
+              className="p-2 text-muted-foreground hover:text-foreground rounded-lg cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               aria-label="Sign out"
             >
               <LogOut className="h-5 w-5" />
@@ -67,28 +70,28 @@ export default async function DriverLayout({
         <div className="flex justify-around py-2 md:flex md:gap-4 md:px-4 md:py-3 md:max-w-4xl md:mx-auto">
           <Link
             href="/driver/dashboard"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2"
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2 cursor-pointer rounded-xl px-2 py-1 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Car className="h-5 w-5" />
             <span className="text-xs md:text-sm">Dashboard</span>
           </Link>
           <Link
             href="/driver/vehicles"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2"
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2 cursor-pointer rounded-xl px-2 py-1 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Car className="h-5 w-5" />
             <span className="text-xs md:text-sm">Vehicles</span>
           </Link>
           <Link
             href="/driver/receipts"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2"
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2 cursor-pointer rounded-xl px-2 py-1 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Receipt className="h-5 w-5" />
             <span className="text-xs md:text-sm">Receipts</span>
           </Link>
           <Link
             href="/driver/requests"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2"
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground md:flex-row md:gap-2 cursor-pointer rounded-xl px-2 py-1 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Wrench className="h-5 w-5" />
             <span className="text-xs md:text-sm">Requests</span>

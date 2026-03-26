@@ -18,7 +18,7 @@
   --secondary:            #ededf5;
   --secondary-foreground: #0f0f1a;
   --muted:                #ededf5;
-  --muted-foreground:     #64748b;
+  --muted-foreground:     #475569;
   --accent:               #ede9fe;
   --accent-foreground:    #4c1d95;
   --destructive:          #f43f5e;
@@ -113,4 +113,24 @@ body {
   .delay-3 { animation-delay: 0.15s; }
   .delay-4 { animation-delay: 0.20s; }
   .delay-5 { animation-delay: 0.25s; }
+
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
