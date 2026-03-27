@@ -85,71 +85,71 @@ export function HeroSection() {
               className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--background)_75%)]"
             />
             <div className="mx-auto max-w-7xl px-6">
-              <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
-                <AnimatedGroup variants={transitionVariants}>
-                  <h1 className="mx-auto mt-8 max-w-4xl text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                    Modern fleet management for families and small teams
-                  </h1>
-                  <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-muted-foreground">
-                    Track vehicles, maintenance, insurance, and receipts in one place — customizable
-                    workflows that fit how you actually run your fleet.
-                  </p>
-                </AnimatedGroup>
+              <div className="grid items-center gap-10 pb-16 pt-6 lg:grid-cols-2 lg:gap-12 lg:pb-24 lg:pt-10">
+                <div className="text-center lg:text-left">
+                  <AnimatedGroup variants={transitionVariants}>
+                    <h1 className="mx-auto max-w-3xl text-balance text-5xl md:text-6xl lg:mx-0 lg:text-6xl xl:text-7xl">
+                      Modern fleet management for families and small teams
+                    </h1>
+                    <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-muted-foreground lg:mx-0">
+                      Track vehicles, maintenance, insurance, and receipts in one place with streamlined
+                      workflows that fit how you actually run your fleet.
+                    </p>
+                  </AnimatedGroup>
 
-                <AnimatedGroup
-                  variants={{
-                    container: {
-                      visible: {
-                        transition: {
-                          staggerChildren: 0.05,
-                          delayChildren: 0.75,
+                  <AnimatedGroup
+                    variants={{
+                      container: {
+                        visible: {
+                          transition: {
+                            staggerChildren: 0.05,
+                            delayChildren: 0.75,
+                          },
                         },
                       },
-                    },
-                    ...transitionVariants,
-                  }}
-                  className="mt-12 flex flex-col items-center justify-center"
-                >
-                  <div className="rounded-[14px] border border-border bg-foreground/10 p-0.5">
-                    <Button asChild size="lg" className="rounded-xl px-8 text-base">
-                      <Link href="/login">
-                        <span className="text-nowrap">Sign in</span>
-                      </Link>
-                    </Button>
-                  </div>
-                </AnimatedGroup>
-              </div>
-            </div>
+                      ...transitionVariants,
+                    }}
+                    className="mt-10 flex justify-center lg:justify-start"
+                  >
+                    <div className="rounded-[14px] border border-border bg-foreground/10 p-0.5">
+                      <Button asChild size="lg" className="rounded-xl px-8 text-base">
+                        <Link href="/login">
+                          <span className="text-nowrap">Sign in</span>
+                        </Link>
+                      </Button>
+                    </div>
+                  </AnimatedGroup>
+                </div>
 
-          </div>
-        </section>
-        <section className="bg-background pb-16 pt-16 md:pb-32">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="relative overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-lg shadow-zinc-950/10 ring-1 ring-border md:p-5 dark:shadow-zinc-950/20">
-              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl">
-                <Image
-                  src="/images/dashboard-preview.png"
-                  alt="Fleet Manager dashboard preview"
-                  fill
-                  className="object-cover object-top"
-                  sizes="(max-width: 1280px) 100vw, 1280px"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-background/10 backdrop-blur-[3px] md:backdrop-blur-[4px]"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/5 to-background/75"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent"
-                />
-                <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <Button asChild size="lg" className="rounded-xl px-6 text-sm md:px-8 md:text-base">
-                    <Link href="/login">Sign in to view full dashboard</Link>
-                  </Button>
+                <div className="relative">
+                  <div className="relative overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-lg shadow-zinc-950/10 ring-1 ring-border md:p-4 dark:shadow-zinc-950/20">
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
+                      <Image
+                        src="/images/dashboard-preview.png"
+                        alt="Fleet Manager dashboard preview"
+                        fill
+                        className="object-cover object-top"
+                        sizes="(max-width: 1024px) 100vw, 720px"
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 bg-background/15 backdrop-blur-[2px] md:backdrop-blur-[3px]"
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/10 to-background/70"
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent"
+                      />
+                      <div className="absolute inset-0 flex items-end justify-center p-4 md:p-6">
+                        <Button asChild size="sm" className="rounded-lg px-5 md:px-6">
+                          <Link href="/login">Sign in to view full dashboard</Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
