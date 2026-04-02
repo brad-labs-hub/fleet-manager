@@ -34,6 +34,21 @@ function getExtension(url: string): string {
     : ".pdf";
 }
 
+function tryExtractReceiptsObjectPath(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    // Handles both:
+    // - /storage/v1/object/public/receipts/<path>
+    // - /storage/v1/object/sign/receipts/<path>
+    const marker = /\/storage\/v1\/object\/(?:public|sign)\/receipts\/(.+)$/;
+    const match = parsed.pathname.match(marker);
+    if (!match || !match[1]) return null;
+    return decodeURIComponent(match[1]);
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -113,9 +128,27 @@ export async function POST(request: NextRequest) {
       if (!docUrl) continue;
 
       try {
+        let buf: Buffer | null = null;
+
+        // First attempt: fetch the URL as-is (works for public/static URLs).
         const resp = await fetch(docUrl);
-        if (!resp.ok) continue;
-        const buf = Buffer.from(await resp.arrayBuffer());
+        if (resp.ok) {
+          buf = Buffer.from(await resp.arrayBuffer());
+        } else {
+          // Fallback: download from the receipts bucket using object path.
+          // This covers signed/expired URLs and private bucket policies.
+          const objectPath = tryExtractReceiptsObjectPath(docUrl);
+          if (objectPath) {
+            const { data: fileBlob } = await supabase.storage
+              .from("receipts")
+              .download(objectPath);
+            if (fileBlob) {
+              buf = Buffer.from(await fileBlob.arrayBuffer());
+            }
+          }
+        }
+
+        if (!buf || buf.length === 0) continue;
         const ext = getExtension(docUrl);
         const baseName = formatReceiptFilename(
           Number((r as { amount: number }).amount),
