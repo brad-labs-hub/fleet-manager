@@ -55,6 +55,10 @@ A full-stack fleet management application for high net worth families. Manage ve
    SELECT 'user-uuid', id FROM locations WHERE code = '858';
    ```
 
+## Client demo (Crown Fleet)
+
+For a separate Vercel deployment (`crownfleet.vercel.app`) with preloaded luxury fleet data, run [`supabase/seed-demo-crownfleet.sql`](supabase/seed-demo-crownfleet.sql) after migrations and follow [docs/demo-crownfleet.md](docs/demo-crownfleet.md).
+
 ## Locations (Seed Data)
 
 | Code | Name | Address |

@@ -41,6 +41,8 @@ export function ReceiptsList({
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [exportLoading, setExportLoading] = useState<"selected" | "filtered" | null>(null);
 
   const filtered = useMemo(() => {
     return receipts.filter((r) => {
@@ -51,6 +53,66 @@ export function ReceiptsList({
       return true;
     });
   }, [receipts, vehicleFilter, categoryFilter, dateFrom, dateTo]);
+
+  const visibleIds = useMemo(() => filtered.map((r) => r.id), [filtered]);
+  const selectedCount = selectedIds.size;
+  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
+  const selectedVisibleCount = visibleIds.filter((id) => selectedIds.has(id)).length;
+  const filteredAttachmentCount = filtered.filter((r) => Boolean(r.document_url)).length;
+
+  function toggleSelection(id: string, checked: boolean) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAllVisible(checked: boolean) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      for (const id of visibleIds) {
+        if (checked) next.add(id);
+        else next.delete(id);
+      }
+      return next;
+    });
+  }
+
+  async function exportZip(
+    type: "selected" | "filtered",
+    payload: { startDate?: string; endDate?: string; receiptIds?: string[] }
+  ) {
+    setExportLoading(type);
+    try {
+      const res = await fetch("/api/export/accountant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Export failed");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const suffix = new Date().toISOString().slice(0, 10);
+      a.download =
+        type === "selected"
+          ? `receipts-selected-${suffix}.zip`
+          : `receipts-filtered-${suffix}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExportLoading(null);
+    }
+  }
 
   async function handleDelete(r: ReceiptRow) {
     if (!confirm(`Delete this receipt (${formatCurrency(Number(r.amount))} on ${formatDate(r.date)})?`)) return;
@@ -128,10 +190,76 @@ export function ReceiptsList({
         </CardContent>
       </Card>
       <div className="space-y-3">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  {filtered.length} filtered receipts, {filteredAttachmentCount} with attachments
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {selectedCount} selected ({selectedVisibleCount} visible in current filter)
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="inline-flex items-center gap-2 text-sm text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={(e) => toggleSelectAllVisible(e.target.checked)}
+                    className="h-4 w-4 rounded border-input"
+                  />
+                  Select all filtered
+                </label>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedIds(new Set())}
+                  disabled={selectedCount === 0 || exportLoading !== null}
+                >
+                  Clear selection
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    exportZip("filtered", {
+                      startDate: dateFrom || undefined,
+                      endDate: dateTo || undefined,
+                    })
+                  }
+                  disabled={filtered.length === 0 || exportLoading !== null}
+                >
+                  {exportLoading === "filtered"
+                    ? "Exporting..."
+                    : "Export all filtered"}
+                </Button>
+                <Button
+                  onClick={() =>
+                    exportZip("selected", {
+                      receiptIds: Array.from(selectedIds),
+                    })
+                  }
+                  disabled={selectedCount === 0 || exportLoading !== null}
+                >
+                  {exportLoading === "selected"
+                    ? "Exporting..."
+                    : `Export selected (${selectedCount})`}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         {filtered.map((r) => (
           <Card key={r.id}>
             <CardContent className="p-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  aria-label={`Select receipt ${r.vendor ?? r.category ?? "receipt"} ${r.date}`}
+                  checked={selectedIds.has(r.id)}
+                  onChange={(e) => toggleSelection(r.id, e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-input"
+                />
+                <div className="min-w-0 flex-1">
                 <p className="font-medium text-foreground capitalize">
                   {r.category?.replace("_", " ")}
                 </p>
@@ -155,6 +283,7 @@ export function ReceiptsList({
                     )}
                   </p>
                 )}
+                </div>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6 sm:shrink-0 sm:border-l sm:border-border sm:pl-6">
                 <p className="font-semibold text-foreground tabular-nums text-right text-lg sm:text-base sm:min-w-[6.5rem] sm:pt-0">

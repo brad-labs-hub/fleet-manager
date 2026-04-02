@@ -37,7 +37,18 @@ function getExtension(url: string): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { startDate, endDate } = body as { startDate?: string; endDate?: string };
+    const { startDate, endDate, receiptIds } = body as {
+      startDate?: string;
+      endDate?: string;
+      receiptIds?: string[];
+    };
+
+    if (receiptIds && !Array.isArray(receiptIds)) {
+      return NextResponse.json(
+        { error: "receiptIds must be an array of receipt IDs" },
+        { status: 400 }
+      );
+    }
 
     const supabase = await createClient();
     let query = supabase
@@ -45,8 +56,12 @@ export async function POST(request: NextRequest) {
       .select("id, date, category, amount, vendor, notes, document_url, vehicle:vehicles(make, model, year)")
       .order("date", { ascending: true });
 
-    if (startDate) query = query.gte("date", startDate);
-    if (endDate) query = query.lte("date", endDate);
+    if (receiptIds && receiptIds.length > 0) {
+      query = query.in("id", receiptIds);
+    } else {
+      if (startDate) query = query.gte("date", startDate);
+      if (endDate) query = query.lte("date", endDate);
+    }
 
     const { data: receipts, error } = await query;
     if (error) throw error;
