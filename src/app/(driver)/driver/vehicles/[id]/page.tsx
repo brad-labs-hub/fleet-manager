@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Key, Droplets, Wrench, AlertTriangle, FileText, ClipboardCheck } from "lucide-react";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { getSecureDocumentHref } from "@/lib/document-links";
 
 export default async function VehicleDetailPage({
   params,
@@ -180,7 +181,7 @@ export default async function VehicleDetailPage({
                     </div>
                     {i.document_url ? (
                       <a
-                        href={i.document_url}
+                        href={getSecureDocumentHref(i.document_url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
@@ -216,7 +217,7 @@ export default async function VehicleDetailPage({
                     </div>
                     {r.document_url ? (
                       <a
-                        href={r.document_url}
+                        href={getSecureDocumentHref(r.document_url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
@@ -260,7 +261,7 @@ export default async function VehicleDetailPage({
                       </div>
                       {w.document_url ? (
                         <a
-                          href={w.document_url}
+                          href={getSecureDocumentHref(w.document_url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
@@ -311,7 +312,7 @@ export default async function VehicleDetailPage({
                       </div>
                       {e.document_url ? (
                         <a
-                          href={e.document_url}
+                          href={getSecureDocumentHref(e.document_url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"

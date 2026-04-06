@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/utils";
+import { getSecureDocumentHref } from "@/lib/document-links";
 import { FileText, Search, Trash2, ExternalLink } from "lucide-react";
 
 export type DocumentSource = "insurance" | "registration" | "warranty" | "emissions" | "vault" | "maintenance";
@@ -240,7 +241,7 @@ export function DocumentLibrary({
                   </span>
                 )}
                 <a
-                  href={d.documentUrl}
+                  href={getSecureDocumentHref(d.documentUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-accent transition-colors"

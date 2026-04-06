@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { getSecureDocumentHref } from "@/lib/document-links";
 import { VehicleDriverAssignments } from "./vehicle-driver-assignments";
 import { MaintenanceSectionList } from "./maintenance/maintenance-section-list";
 
@@ -187,7 +188,7 @@ export default async function AdminVehicleDetailPage({
                       <span className="text-muted-foreground">expires {formatDate(i.expiry_date)}</span>
                       {i.document_url && (
                         <a
-                          href={i.document_url}
+                          href={getSecureDocumentHref(i.document_url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary hover:underline text-xs font-medium"
@@ -222,7 +223,7 @@ export default async function AdminVehicleDetailPage({
                       <span className="text-muted-foreground">expires {formatDate(r.expiry_date)}</span>
                       {r.document_url && (
                         <a
-                          href={r.document_url}
+                          href={getSecureDocumentHref(r.document_url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary hover:underline text-xs font-medium"
@@ -277,7 +278,7 @@ export default async function AdminVehicleDetailPage({
                       {expiry && <span className="text-muted-foreground">{expiry}</span>}
                       {w.document_url && (
                         <a
-                          href={w.document_url}
+                          href={getSecureDocumentHref(w.document_url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary hover:underline text-xs font-medium"
@@ -337,7 +338,7 @@ export default async function AdminVehicleDetailPage({
                     </span>
                     {e.document_url && (
                       <a
-                        href={e.document_url}
+                        href={getSecureDocumentHref(e.document_url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline text-xs font-medium shrink-0"

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { getSecureDocumentHref } from "@/lib/document-links";
 
 export default async function ReceiptDetailPage({
   params,
@@ -66,7 +67,7 @@ export default async function ReceiptDetailPage({
           {receipt.document_url && (
             <div>
               <a
-                href={receipt.document_url}
+                href={getSecureDocumentHref(receipt.document_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground underline"

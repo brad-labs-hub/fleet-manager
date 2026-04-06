@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RECEIPT_CATEGORIES, type ReceiptCategory } from "@/types/database";
+import { getSecureDocumentHref } from "@/lib/document-links";
 
 export default function EditReceiptPage() {
   const params = useParams();
@@ -210,7 +211,7 @@ export default function EditReceiptPage() {
               />
               {documentUrl && !file && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  <a href={documentUrl} target="_blank" rel="noopener noreferrer" className="underline">
+                  <a href={getSecureDocumentHref(documentUrl)} target="_blank" rel="noopener noreferrer" className="underline">
                     View current document
                   </a>
                 </p>

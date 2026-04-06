@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { getSecureDocumentHref } from "@/lib/document-links";
 
 type ReceiptRow = {
   id: string;
@@ -296,7 +297,7 @@ export function ReceiptsList({
                 >
                   {r.document_url && (
                     <Button variant="outline" size="sm" className="gap-1.5" asChild>
-                      <a href={r.document_url} target="_blank" rel="noopener noreferrer">
+                      <a href={getSecureDocumentHref(r.document_url)} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />
                         Document
                       </a>
