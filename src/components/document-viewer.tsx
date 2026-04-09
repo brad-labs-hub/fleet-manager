@@ -25,10 +25,7 @@ export function DocumentViewer({
 }: DocumentViewerProps) {
   const [sharing, setSharing] = useState(false);
   const defaultLayout = useMemo(() => defaultLayoutPlugin(), []);
-  const workerUrl = useMemo(
-    () => new URL("pdfjs-dist/build/pdf.worker.min.js", import.meta.url).toString(),
-    []
-  );
+  const workerUrl = "/api/pdf-worker";
 
   async function handleShare() {
     setSharing(true);
