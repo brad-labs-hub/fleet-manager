@@ -138,6 +138,10 @@ For local Supabase (`supabase start`), the repo includes a Resend SMTP example i
   - `/api/auth/onedrive/start`
 - OAuth callbacks validate `state` and no longer return access tokens in URL params.
 - Receipts storage bucket is hardened to private access by migration and read access stays behind authenticated policies.
+- Document opens are proxied through `/api/storage/open`, require an authenticated app session, and return `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex`.
+- `robots.txt` disallows crawlers from `/admin`, `/driver`, `/api/storage/open`, and `/api/export`.
+- Supabase `.../object/sign/...` URLs are bearer tokens. Do not share them externally.
+- If a signed URL is leaked, rotate the Storage URL signing key in Supabase immediately to invalidate previously issued tokens.
 
 ### Health and Alerting
 

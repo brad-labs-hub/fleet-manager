@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +12,13 @@ import {
   type AdminBellMaintenanceItem,
 } from "@/components/admin-alerts-bell";
 import { AdminNav } from "./admin-nav";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 function normalizeVehicle(
   raw: unknown

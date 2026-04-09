@@ -25,7 +25,12 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.headers.set(
+      "X-Robots-Tag",
+      "noindex, nofollow, noarchive, nosnippet, noimageindex"
+    );
+    return response;
   }
 
   const raw = request.nextUrl.searchParams.get("documentUrl");
@@ -56,6 +61,8 @@ export async function GET(request: NextRequest) {
         "Content-Type": contentType,
         "Content-Disposition": `inline; filename="${filename}"`,
         "Cache-Control": "private, no-store",
+        "X-Robots-Tag":
+          "noindex, nofollow, noarchive, nosnippet, noimageindex",
       },
     });
   } catch {
