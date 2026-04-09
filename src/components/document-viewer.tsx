@@ -25,6 +25,10 @@ export function DocumentViewer({
 }: DocumentViewerProps) {
   const [sharing, setSharing] = useState(false);
   const defaultLayout = useMemo(() => defaultLayoutPlugin(), []);
+  const workerUrl = useMemo(
+    () => new URL("pdfjs-dist/build/pdf.worker.min.js", import.meta.url).toString(),
+    []
+  );
 
   async function handleShare() {
     setSharing(true);
@@ -138,7 +142,7 @@ export function DocumentViewer({
         <CardContent className="p-0">
           {fileType === "pdf" ? (
             <div className="h-[calc(100vh-15rem)] min-h-[680px]">
-              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+              <Worker workerUrl={workerUrl}>
                 <Viewer fileUrl={streamUrl} plugins={[defaultLayout]} />
               </Worker>
             </div>
