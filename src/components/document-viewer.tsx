@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, Download, ExternalLink, Printer, Share2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Viewer, Worker } from "@react-pdf-viewer/core";
-import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 
 type ViewerFileType = "pdf" | "image";
 
@@ -24,8 +22,6 @@ export function DocumentViewer({
   backTo,
 }: DocumentViewerProps) {
   const [sharing, setSharing] = useState(false);
-  const defaultLayout = useMemo(() => defaultLayoutPlugin(), []);
-  const workerUrl = "/api/pdf-worker";
 
   async function handleShare() {
     setSharing(true);
@@ -138,11 +134,11 @@ export function DocumentViewer({
       <Card className="border-border bg-card">
         <CardContent className="p-0">
           {fileType === "pdf" ? (
-            <div className="h-[calc(100vh-15rem)] min-h-[680px]">
-              <Worker workerUrl={workerUrl}>
-                <Viewer fileUrl={streamUrl} plugins={[defaultLayout]} />
-              </Worker>
-            </div>
+            <iframe
+              src={streamUrl}
+              title={title}
+              className="h-[calc(100vh-15rem)] min-h-[680px] w-full border-0"
+            />
           ) : (
             <div className="flex min-h-[680px] items-center justify-center bg-muted/20 p-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
