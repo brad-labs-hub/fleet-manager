@@ -182,8 +182,6 @@ export default async function VehicleDetailPage({
                     {i.document_url ? (
                       <a
                         href={getSecureDocumentHref(i.document_url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
                         aria-label="View insurance PDF"
                       >
@@ -218,8 +216,6 @@ export default async function VehicleDetailPage({
                     {r.document_url ? (
                       <a
                         href={getSecureDocumentHref(r.document_url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
                         aria-label="View registration PDF"
                       >
@@ -262,8 +258,6 @@ export default async function VehicleDetailPage({
                       {w.document_url ? (
                         <a
                           href={getSecureDocumentHref(w.document_url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
                           aria-label="View warranty PDF"
                         >
@@ -313,8 +307,6 @@ export default async function VehicleDetailPage({
                       {e.document_url ? (
                         <a
                           href={getSecureDocumentHref(e.document_url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
                           aria-label="View emissions certificate"
                         >

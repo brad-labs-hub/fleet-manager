@@ -6,6 +6,8 @@
 
 /* Leaflet map styles */
 @import "leaflet/dist/leaflet.css";
+@import "@react-pdf-viewer/core/lib/styles/index.css";
+@import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 /* ── LIGHT MODE ─────────────────────────────────────── */
 :root {

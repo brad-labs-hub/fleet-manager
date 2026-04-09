@@ -242,8 +242,6 @@ export function DocumentLibrary({
                 )}
                 <a
                   href={getSecureDocumentHref(d.documentUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-accent transition-colors"
                 >
                   <FileText className="w-3.5 h-3.5" />

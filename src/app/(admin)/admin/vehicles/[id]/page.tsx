@@ -189,8 +189,6 @@ export default async function AdminVehicleDetailPage({
                       {i.document_url && (
                         <a
                           href={getSecureDocumentHref(i.document_url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="text-primary hover:underline text-xs font-medium"
                           aria-label="View insurance document"
                         >
@@ -224,8 +222,6 @@ export default async function AdminVehicleDetailPage({
                       {r.document_url && (
                         <a
                           href={getSecureDocumentHref(r.document_url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="text-primary hover:underline text-xs font-medium"
                           aria-label="View registration document"
                         >
@@ -279,8 +275,6 @@ export default async function AdminVehicleDetailPage({
                       {w.document_url && (
                         <a
                           href={getSecureDocumentHref(w.document_url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="text-primary hover:underline text-xs font-medium"
                           aria-label="View warranty document"
                         >
@@ -339,8 +333,6 @@ export default async function AdminVehicleDetailPage({
                     {e.document_url && (
                       <a
                         href={getSecureDocumentHref(e.document_url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="text-primary hover:underline text-xs font-medium shrink-0"
                       >
                         View

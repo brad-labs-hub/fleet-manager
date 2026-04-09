@@ -297,7 +297,7 @@ export function ReceiptsList({
                 >
                   {r.document_url && (
                     <Button variant="outline" size="sm" className="gap-1.5" asChild>
-                      <a href={getSecureDocumentHref(r.document_url)} target="_blank" rel="noopener noreferrer">
+                      <a href={getSecureDocumentHref(r.document_url)}>
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />
                         Document
                       </a>

@@ -211,7 +211,7 @@ export default function EditReceiptPage() {
               />
               {documentUrl && !file && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  <a href={getSecureDocumentHref(documentUrl)} target="_blank" rel="noopener noreferrer" className="underline">
+                  <a href={getSecureDocumentHref(documentUrl)} className="underline">
                     View current document
                   </a>
                 </p>

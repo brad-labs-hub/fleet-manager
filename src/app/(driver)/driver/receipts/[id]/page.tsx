@@ -68,8 +68,6 @@ export default async function ReceiptDetailPage({
             <div>
               <a
                 href={getSecureDocumentHref(receipt.document_url)}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground underline"
               >
                 View document
