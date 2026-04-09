@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Download, ExternalLink, Printer, Share2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,49 @@ export function DocumentViewer({
   backTo,
 }: DocumentViewerProps) {
   const [sharing, setSharing] = useState(false);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loadingFile, setLoadingFile] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+    let objectUrl: string | null = null;
+
+    async function loadFile() {
+      setLoadingFile(true);
+      setLoadError(null);
+      try {
+        const response = await fetch(streamUrl, { credentials: "include" });
+        if (!response.ok) {
+          throw new Error(`Failed to load document (${response.status})`);
+        }
+        const fileBlob = await response.blob();
+        objectUrl = URL.createObjectURL(fileBlob);
+        if (!isCancelled) {
+          setBlobUrl(objectUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load document for viewer", error);
+        if (!isCancelled) {
+          setBlobUrl(null);
+          setLoadError("Unable to load this document in viewer.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoadingFile(false);
+        }
+      }
+    }
+
+    loadFile();
+
+    return () => {
+      isCancelled = true;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [streamUrl]);
 
   async function handleShare() {
     setSharing(true);
@@ -44,18 +87,20 @@ export function DocumentViewer({
   }
 
   function handleDownload() {
+    const targetUrl = blobUrl ?? streamUrl;
     const link = document.createElement("a");
-    link.href = streamUrl;
+    link.href = targetUrl;
     link.download = title;
     link.click();
   }
 
   function handlePrint() {
+    const targetUrl = blobUrl ?? streamUrl;
     const iframe = document.createElement("iframe");
     iframe.style.position = "fixed";
     iframe.style.opacity = "0";
     iframe.style.pointerEvents = "none";
-    iframe.src = streamUrl;
+    iframe.src = targetUrl;
     iframe.onload = () => {
       iframe.contentWindow?.focus();
       iframe.contentWindow?.print();
@@ -67,7 +112,7 @@ export function DocumentViewer({
   }
 
   function handleOpenNewTab() {
-    window.open(streamUrl, "_blank", "noopener,noreferrer");
+    window.open(blobUrl ?? streamUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -133,9 +178,20 @@ export function DocumentViewer({
 
       <Card className="border-border bg-card">
         <CardContent className="p-0">
-          {fileType === "pdf" ? (
+          {loadingFile ? (
+            <div className="flex h-[calc(100vh-15rem)] min-h-[680px] items-center justify-center text-sm text-muted-foreground">
+              Loading document...
+            </div>
+          ) : loadError || !blobUrl ? (
+            <div className="flex h-[calc(100vh-15rem)] min-h-[680px] flex-col items-center justify-center gap-3 px-6 text-center">
+              <p className="text-sm text-destructive">{loadError ?? "Unable to load document."}</p>
+              <Button variant="outline" size="sm" onClick={handleOpenNewTab}>
+                Open in new tab
+              </Button>
+            </div>
+          ) : fileType === "pdf" ? (
             <iframe
-              src={streamUrl}
+              src={blobUrl}
               title={title}
               className="h-[calc(100vh-15rem)] min-h-[680px] w-full border-0"
             />
@@ -143,7 +199,7 @@ export function DocumentViewer({
             <div className="flex min-h-[680px] items-center justify-center bg-muted/20 p-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={streamUrl}
+                src={blobUrl}
                 alt={title}
                 className="max-h-[calc(100vh-18rem)] max-w-full rounded-md object-contain shadow-sm"
               />
