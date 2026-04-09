@@ -9,7 +9,7 @@ type ParsedStoragePath = {
 function parseStorageUrl(rawUrl: string): ParsedStoragePath | null {
   try {
     const parsed = new URL(rawUrl);
-    const marker = /\/storage\/v1\/object\/(?:public|sign)\/([^/]+)\/(.+)$/;
+    const marker = /\/storage\/v1\/object\/(?:public|sign|authenticated)\/([^/]+)\/(.+)$/;
     const match = parsed.pathname.match(marker);
     if (!match || !match[1] || !match[2]) return null;
     return {
@@ -22,6 +22,12 @@ function parseStorageUrl(rawUrl: string): ParsedStoragePath | null {
 }
 
 export async function GET(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   const raw = request.nextUrl.searchParams.get("documentUrl");
   if (!raw) {
     return NextResponse.json({ error: "Missing documentUrl" }, { status: 400 });
@@ -29,21 +35,30 @@ export async function GET(request: NextRequest) {
 
   const parsed = parseStorageUrl(raw);
   if (!parsed) {
-    return NextResponse.redirect(raw);
+    return NextResponse.json({ error: "Invalid storage URL" }, { status: 400 });
   }
 
   try {
-    const supabase = await createClient();
     const { data, error } = await supabase.storage
       .from(parsed.bucket)
-      .createSignedUrl(parsed.objectPath, 60);
+      .download(parsed.objectPath);
 
-    if (error || !data?.signedUrl) {
-      return NextResponse.redirect(raw);
+    if (error || !data) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    return NextResponse.redirect(data.signedUrl);
+    const fileBuffer = await data.arrayBuffer();
+    const filename = parsed.objectPath.split("/").pop() || "document";
+    const contentType = data.type || "application/octet-stream";
+
+    return new NextResponse(fileBuffer, {
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `inline; filename="${filename}"`,
+        "Cache-Control": "private, no-store",
+      },
+    });
   } catch {
-    return NextResponse.redirect(raw);
+    return NextResponse.json({ error: "Unable to open document" }, { status: 500 });
   }
 }
