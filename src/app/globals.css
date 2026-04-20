@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -49,6 +49,7 @@
   --surface2:             #f4f4f8;
   --surface3:             #ededf5;
   --border-hi:            rgba(0,0,0,0.10);
+  --grid:                 rgba(15,15,26,0.055);
 }
 
 /* ── DARK MODE ──────────────────────────────────────── */
@@ -91,6 +92,7 @@
   --surface2:             #16162a;
   --surface3:             #1c1c32;
   --border-hi:            rgba(255,255,255,0.12);
+  --grid:                 rgba(255,255,255,0.045);
 }
 
 /* ── BASE ───────────────────────────────────────────── */
@@ -120,9 +122,62 @@ body {
   .delay-4 { animation-delay: 0.20s; }
   .delay-5 { animation-delay: 0.25s; }
 
+  .micro {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
   .focus-ring {
     @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl;
   }
+}
+
+/* ── Grid background ───────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(to right,  var(--grid, rgba(15,15,26,0.055)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid, rgba(15,15,26,0.055)) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.dark .grid-bg {
+  --grid: rgba(255,255,255,0.045);
+}
+
+/* ── Aurora ambient glow ───────────────────────────── */
+.aurora {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(99,102,241,0.14), transparent 60%),
+    radial-gradient( 900px 400px at 90%  0%, rgba(124,58,237,0.11), transparent 60%),
+    radial-gradient( 700px 500px at 50% 110%, rgba(16,185,129,0.06), transparent 60%);
+}
+
+.dark .aurora {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(99,102,241,0.22), transparent 60%),
+    radial-gradient( 900px 400px at 90%  0%, rgba(124,58,237,0.18), transparent 60%),
+    radial-gradient( 700px 500px at 50% 110%, rgba(16,185,129,0.10), transparent 60%);
+}
+
+/* ── Bar rise animation ────────────────────────────── */
+@keyframes riseBar {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+.bar-rise {
+  transform-origin: bottom;
+  animation: riseBar 0.55s cubic-bezier(.4,0,.2,1) both;
+}
+
+/* ── Pulse dot (streaming indicator) ───────────────── */
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.pulse-dot {
+  animation: pulseDot 1.8s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
