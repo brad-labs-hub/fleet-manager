@@ -5,6 +5,7 @@ import { Car, Receipt, Plus, ArrowRight, Bell, TrendingUp } from "lucide-react";
 import { HolographicCard } from "@/components/ui/holographic-card";
 import { Sparkline } from "@/components/ui/sparkline";
 import { CategoryBars } from "./category-bars";
+import { GreetingHeader } from "./greeting";
 import { MonthlySpendChart } from "./analytics-charts";
 
 function localDayKey(d: Date): string {
@@ -16,13 +17,6 @@ function localDayKey(d: Date): string {
 
 function receiptDayKey(dateStr: string | null | undefined): string {
   return String(dateStr ?? "").slice(0, 10);
-}
-
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -254,29 +248,11 @@ export default async function AdminDashboardPage() {
 
   const maxBars = Math.max(...weeklyActivityBars.map((b) => b.value), 1);
 
-  const todayLabel = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
   return (
     <div className="relative z-10 space-y-6">
       {/* ── Greeting Header ───────────────────────────── */}
       <div className="flex items-end justify-between flex-wrap gap-4 animate-fade-up">
-        <div>
-          <div className="micro text-muted-foreground mb-1">{todayLabel}</div>
-          <h1 className="text-[30px] leading-[1.05] font-bold font-syne tracking-tight">
-            {getGreeting()}, {firstName}.
-            <br />
-            <span className="text-muted-foreground font-medium">
-              Your fleet is{" "}
-              <span className="text-foreground">calm</span> &mdash;{" "}
-              {alertsTotal} item{alertsTotal !== 1 ? "s" : ""} need attention.
-            </span>
-          </h1>
-        </div>
+        <GreetingHeader firstName={firstName} alertsTotal={alertsTotal} />
         <div className="flex gap-2">
           <Link
             href="/admin/receipts/new"
