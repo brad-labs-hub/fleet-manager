@@ -311,19 +311,19 @@ export default async function AdminDashboardPage() {
           },
         ].map((k) => (
           <HolographicCard key={k.title} interactive>
-            <div className="p-4 flex items-start justify-between gap-3">
-              <div>
+            <div className="p-3 sm:p-4 flex items-start justify-between gap-2 sm:gap-3">
+              <div className="min-w-0">
                 <div className="micro text-muted-foreground">{k.title}</div>
-                <div className="mt-1.5 text-3xl font-bold font-syne tracking-tight">
+                <div className="mt-1 sm:mt-1.5 text-2xl sm:text-3xl font-bold font-syne tracking-tight truncate">
                   {k.value}
                 </div>
-                <div className="text-[11px] text-muted-foreground mt-1">
+                <div className="text-[11px] text-muted-foreground mt-1 truncate">
                   {k.sub}
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 <div
-                  className="h-8 w-8 rounded-lg flex items-center justify-center"
+                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center"
                   style={{
                     background: "var(--indigo-dim)",
                     color: k.accent,
@@ -331,7 +331,7 @@ export default async function AdminDashboardPage() {
                 >
                   {k.icon}
                 </div>
-                <div className="w-20 h-7 opacity-90">
+                <div className="w-16 sm:w-20 h-7 opacity-90 hidden sm:block">
                   <Sparkline
                     data={k.spark}
                     stroke={k.accent}
@@ -353,7 +353,7 @@ export default async function AdminDashboardPage() {
           interactive={false}
           className="flex flex-col min-h-0 animate-fade-up delay-2"
         >
-          <div className="flex items-center justify-between p-5 pb-3">
+          <div className="flex items-center justify-between p-4 sm:p-5 pb-3">
             <div>
               <div className="flex items-center gap-2">
                 <div
@@ -378,9 +378,9 @@ export default async function AdminDashboardPage() {
               All <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="px-3 pb-3 flex-1 min-h-0">
+          <div className="px-2 sm:px-3 pb-3 flex-1 min-h-0">
             {vehicles.length > 0 ? (
-              <ul className="space-y-1.5 max-h-[26rem] overflow-y-auto pr-1">
+              <ul className="space-y-1 sm:space-y-1.5 max-h-[26rem] overflow-y-auto pr-1">
                 {vehicles.map((v) => {
                   const loc =
                     v.location && typeof v.location === "object"
@@ -437,7 +437,7 @@ export default async function AdminDashboardPage() {
           {/* Spend YTD hero */}
           <HolographicCard
             interactive
-            className="flex-1 p-5 animate-fade-up delay-3"
+            className="flex-1 p-4 sm:p-5 animate-fade-up delay-3"
           >
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold font-syne">
@@ -447,9 +447,9 @@ export default async function AdminDashboardPage() {
                 Last 7 days
               </div>
             </div>
-            <div className="mt-3 flex items-end gap-6 flex-wrap">
-              <div>
-                <div className="text-5xl font-bold font-syne tracking-tight leading-none">
+            <div className="mt-3 flex items-end gap-4 sm:gap-6 flex-wrap">
+              <div className="min-w-0">
+                <div className="text-3xl sm:text-5xl font-bold font-syne tracking-tight leading-none">
                   {formatCurrency(totalReceipts)}
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5 flex-wrap">
@@ -462,10 +462,10 @@ export default async function AdminDashboardPage() {
                   </span>
                 </div>
               </div>
-              <div className="flex-1 min-w-[180px] max-w-sm">
+              <div className="flex-1 min-w-[140px] sm:min-w-[180px] max-w-sm">
                 <div
-                  className="w-full flex items-end gap-1.5"
-                  style={{ height: 96 }}
+                  className="w-full flex items-end gap-1 sm:gap-1.5"
+                  style={{ height: 80 }}
                 >
                   {weeklyActivityBars.map((b, i) => (
                     <div
@@ -493,7 +493,7 @@ export default async function AdminDashboardPage() {
           {/* Recent Receipts */}
           <HolographicCard
             interactive
-            className="p-5 animate-fade-up delay-4"
+            className="p-4 sm:p-5 animate-fade-up delay-4"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -576,7 +576,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 animate-fade-up delay-5">
-          <HolographicCard interactive className="p-5">
+          <HolographicCard interactive className="p-4 sm:p-5">
             <div className="text-sm font-bold font-syne mb-1">
               Spend by category
             </div>
@@ -590,7 +590,7 @@ export default async function AdminDashboardPage() {
             )}
           </HolographicCard>
 
-          <HolographicCard interactive className="p-5">
+          <HolographicCard interactive className="p-4 sm:p-5">
             <div className="text-sm font-bold font-syne mb-1">
               Monthly spend
             </div>
@@ -618,7 +618,7 @@ export default async function AdminDashboardPage() {
             </Link>
           </div>
 
-          <HolographicCard interactive className="p-5 animate-fade-up delay-5">
+          <HolographicCard interactive className="p-4 sm:p-5 animate-fade-up delay-5">
             <ul className="space-y-2">
               {attentionItems.slice(0, 5).map((a, i) => {
                 const dotColor =

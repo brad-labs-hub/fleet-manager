@@ -35,10 +35,10 @@ export function GreetingHeader({
   return (
     <div>
       <div className="micro text-muted-foreground mb-1">{dateLabel}</div>
-      <h1 className="text-[30px] leading-[1.05] font-bold font-syne tracking-tight">
+      <h1 className="text-xl sm:text-[30px] leading-[1.1] sm:leading-[1.05] font-bold font-syne tracking-tight">
         {greeting}, {firstName}.
         <br />
-        <span className="text-muted-foreground font-medium">
+        <span className="text-muted-foreground font-medium text-base sm:text-[30px]">
           Your fleet is{" "}
           <span className="text-foreground">calm</span> &mdash;{" "}
           {alertsTotal} item{alertsTotal !== 1 ? "s" : ""} need attention.
