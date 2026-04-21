@@ -14,7 +14,7 @@ type AiFields = Set<"category" | "amount" | "date" | "vendor" | "notes">;
 
 function AiBadge() {
   return (
-    <span className="ml-1.5 inline-flex items-center gap-0.5 text-[10px] font-medium text-violet-500 dark:text-violet-400">
+    <span className="ml-1.5 inline-flex items-center gap-0.5 text-[10px] font-medium text-teal-500 dark:text-teal-400">
       <Sparkles className="w-2.5 h-2.5" />
       AI
     </span>
@@ -158,14 +158,14 @@ export default function NewReceiptPage() {
               ) : (
                 <div className="flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/30">
                   {scanning ? (
-                    <Loader2 className="w-8 h-8 text-violet-500 shrink-0 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-teal-500 shrink-0 animate-spin" />
                   ) : (
                     <FileText className="w-8 h-8 text-primary shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
                     <span className="block truncate text-sm text-foreground font-medium">{file.name}</span>
                     {scanning && (
-                      <span className="text-xs text-violet-500 flex items-center gap-1 mt-0.5">
+                      <span className="text-xs text-teal-500 flex items-center gap-1 mt-0.5">
                         <Sparkles className="w-3 h-3" /> Reading receipt…
                       </span>
                     )}
@@ -173,7 +173,7 @@ export default function NewReceiptPage() {
                       <span className="text-xs text-muted-foreground mt-0.5">{scanError}</span>
                     )}
                     {!scanning && aiFields.size > 0 && (
-                      <span className="text-xs text-violet-500 flex items-center gap-1 mt-0.5">
+                      <span className="text-xs text-teal-500 flex items-center gap-1 mt-0.5">
                         <Sparkles className="w-3 h-3" /> {aiFields.size} field{aiFields.size !== 1 ? "s" : ""} filled by AI — review below
                       </span>
                     )}

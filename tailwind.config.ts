@@ -55,9 +55,9 @@ const config: Config = {
         },
       },
       boxShadow: {
-        indigo: "0 0 24px rgba(99,102,241,0.25)",
-        "indigo-sm": "0 0 14px rgba(99,102,241,0.18)",
-        "indigo-lg": "0 0 48px rgba(99,102,241,0.3)",
+        emerald: "0 0 24px rgba(16,185,129,0.25)",
+        "emerald-sm": "0 0 14px rgba(16,185,129,0.18)",
+        "emerald-lg": "0 0 48px rgba(16,185,129,0.3)",
       },
     },
   },

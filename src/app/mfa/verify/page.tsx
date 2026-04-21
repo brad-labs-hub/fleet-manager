@@ -76,7 +76,7 @@ export default function MFAVerifyPage() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-indigo">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-emerald">
             <ShieldCheck className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold font-syne text-foreground">Verification required</h1>
@@ -88,7 +88,7 @@ export default function MFAVerifyPage() {
         {status === "loading" && (
           <div className="text-center py-8">
             <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto"
-              style={{ borderColor: "var(--indigo)", borderTopColor: "transparent" }} />
+              style={{ borderColor: "var(--emerald)", borderTopColor: "transparent" }} />
           </div>
         )}
 
@@ -117,7 +117,7 @@ export default function MFAVerifyPage() {
 
               <button type="submit" disabled={status === "verifying" || code.length < 6}
                 className="w-full py-2.5 rounded-xl font-medium text-sm text-white disabled:opacity-50 transition-all"
-                style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)" }}>
+                style={{ background: "linear-gradient(135deg, var(--emerald) 0%, var(--teal) 100%)" }}>
                 {status === "verifying" ? "Verifying…" : "Verify"}
               </button>
             </form>

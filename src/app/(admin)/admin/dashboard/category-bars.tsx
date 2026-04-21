@@ -9,17 +9,17 @@ type CategoryBarData = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  gas: "#6366f1",
-  fuel: "#6366f1",
-  maintenance: "#7c3aed",
+  gas: "#10b981",
+  fuel: "#10b981",
+  maintenance: "#0d9488",
   insurance: "#f59e0b",
-  tires: "#10b981",
+  tires: "#34d399",
   registration: "#f43f5e",
   detailing: "#f97316",
   car_wash: "#f97316",
-  parking: "#818cf8",
-  tolls: "#818cf8",
-  other: "#818cf8",
+  parking: "#6ee7b7",
+  tolls: "#6ee7b7",
+  other: "#6ee7b7",
 };
 
 export function CategoryBars({ data }: { data: CategoryBarData[] }) {
@@ -30,7 +30,7 @@ export function CategoryBars({ data }: { data: CategoryBarData[] }) {
       {data.map((c, i) => {
         const pct = (c.total / max) * 100;
         const color =
-          c.color || CATEGORY_COLORS[c.category.toLowerCase()] || "#818cf8";
+          c.color || CATEGORY_COLORS[c.category.toLowerCase()] || "#6ee7b7";
         return (
           <div key={c.category}>
             <div className="flex items-baseline justify-between mb-1">

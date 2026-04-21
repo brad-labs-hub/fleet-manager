@@ -73,7 +73,7 @@ export function InviteForm({ hasServiceKey }: { hasServiceKey: boolean }) {
           disabled={!hasServiceKey}
           title={!hasServiceKey ? "Add SUPABASE_SERVICE_ROLE_KEY to Vercel environment variables first" : undefined}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)" }}
+          style={{ background: "linear-gradient(135deg, var(--emerald) 0%, var(--teal) 100%)" }}
         >
           <UserPlus className="h-4 w-4" />
           Invite User
@@ -82,7 +82,7 @@ export function InviteForm({ hasServiceKey }: { hasServiceKey: boolean }) {
         <div className="rounded-2xl border border-border bg-card p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold font-syne text-foreground flex items-center gap-2">
-              <Mail className="h-4 w-4" style={{ color: "var(--indigo-soft)" }} />
+              <Mail className="h-4 w-4" style={{ color: "var(--emerald-soft)" }} />
               Send Invitation
             </h3>
             <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors">
@@ -125,10 +125,10 @@ export function InviteForm({ hasServiceKey }: { hasServiceKey: boolean }) {
                     onClick={() => setRole(r)}
                     className={`text-left p-3 rounded-xl border text-sm transition-all ${
                       role === r
-                        ? "border-[rgba(99,102,241,0.4)] text-foreground"
+                        ? "border-[rgba(16,185,129,0.4)] text-foreground"
                         : "border-border text-muted-foreground hover:border-border hover:text-foreground"
                     }`}
-                    style={role === r ? { background: "var(--indigo-dim)" } : {}}
+                    style={role === r ? { background: "var(--emerald-dim)" } : {}}
                   >
                     <div className="font-medium">{label}</div>
                     <div className="text-[11px] mt-0.5 opacity-70">{ROLE_DESCRIPTIONS[r]}</div>
@@ -150,7 +150,7 @@ export function InviteForm({ hasServiceKey }: { hasServiceKey: boolean }) {
               </button>
               <button type="submit" disabled={loading}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white disabled:opacity-50 transition-all"
-                style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)" }}>
+                style={{ background: "linear-gradient(135deg, var(--emerald) 0%, var(--teal) 100%)" }}>
                 <Mail className="h-3.5 w-3.5" />
                 {loading ? "Sending…" : "Send Invite"}
               </button>
@@ -172,7 +172,7 @@ export function UserList({ users, currentUserId }: { users: UserRow[]; currentUs
   const router = useRouter();
 
   const ROLE_BADGE: Record<string, string> = {
-    controller: "bg-[var(--indigo-dim)] text-[var(--indigo-soft)] border border-[rgba(99,102,241,0.25)]",
+    controller: "bg-[var(--emerald-dim)] text-[var(--emerald-soft)] border border-[rgba(16,185,129,0.25)]",
     employee:   "bg-[var(--gold-dim)] text-[var(--gold)] border border-[rgba(245,158,11,0.25)]",
     driver:     "bg-accent text-muted-foreground border border-border",
   };
@@ -322,7 +322,7 @@ export function UserList({ users, currentUserId }: { users: UserRow[]; currentUs
               <td className="px-5 py-3.5">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold font-syne shrink-0"
-                    style={{ background: "var(--indigo-dim)", color: "var(--indigo-soft)" }}>
+                    style={{ background: "var(--emerald-dim)", color: "var(--emerald-soft)" }}>
                     {(u.name ?? u.email ?? "?").charAt(0).toUpperCase()}
                   </div>
                   <div>

@@ -38,7 +38,7 @@ const SOURCE_BADGE_STYLES: Record<DocumentSource, string> = {
   registration: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
   warranty: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   emissions: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  vault: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+  vault: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   maintenance: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
 };
 

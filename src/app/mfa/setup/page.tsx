@@ -99,7 +99,7 @@ export default function MFASetupPage() {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-indigo">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-emerald">
             <ShieldCheck className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold font-syne text-foreground">Set up two-factor authentication</h1>
@@ -111,7 +111,7 @@ export default function MFASetupPage() {
         {status === "enrolling" && (
           <div className="text-center py-8">
             <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-3"
-              style={{ borderColor: "var(--indigo)", borderTopColor: "transparent" }} />
+              style={{ borderColor: "var(--emerald)", borderTopColor: "transparent" }} />
             <p className="text-sm text-muted-foreground">Preparing your 2FA setup…</p>
           </div>
         )}
@@ -134,7 +134,7 @@ export default function MFASetupPage() {
           <div className="space-y-4">
             {/* App recommendation */}
             <div className="rounded-2xl border border-border bg-card p-4 flex items-start gap-3">
-              <Smartphone className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--indigo-soft)" }} />
+              <Smartphone className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--emerald-soft)" }} />
               <div className="text-sm">
                 <p className="font-medium text-foreground">Use an authenticator app</p>
                 <p className="text-muted-foreground text-xs mt-0.5">
@@ -206,7 +206,7 @@ export default function MFASetupPage() {
 
                   <button type="submit" disabled={status === "verifying" || code.length < 6}
                     className="w-full py-2.5 rounded-xl font-medium text-sm text-white disabled:opacity-50 transition-all"
-                    style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)" }}>
+                    style={{ background: "linear-gradient(135deg, var(--emerald) 0%, var(--teal) 100%)" }}>
                     {status === "verifying" ? "Verifying…" : "Activate 2FA"}
                   </button>
                 </form>

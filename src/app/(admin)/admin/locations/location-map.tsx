@@ -53,7 +53,7 @@ export default function LocationMap({ locations, selectedId, onSelect }: Props) 
       // Active marker icon (blue, slightly larger)
       const activeIcon = L.divIcon({
         className: "",
-        html: `<div style="width:22px;height:34px;background:#6366f1;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
+        html: `<div style="width:22px;height:34px;background:#10b981;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
         iconSize: [22, 34],
         iconAnchor: [11, 34],
         popupAnchor: [0, -36],
@@ -117,7 +117,7 @@ export default function LocationMap({ locations, selectedId, onSelect }: Props) 
     import("leaflet").then((L) => {
       const activeIcon = L.divIcon({
         className: "",
-        html: `<div style="width:22px;height:34px;background:#6366f1;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
+        html: `<div style="width:22px;height:34px;background:#10b981;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
         iconSize: [22, 34],
         iconAnchor: [11, 34],
         popupAnchor: [0, -36],

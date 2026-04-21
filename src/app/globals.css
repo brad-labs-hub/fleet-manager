@@ -11,86 +11,82 @@
 
 /* ── LIGHT MODE ─────────────────────────────────────── */
 :root {
-  --background:           #f4f4f8;
-  --foreground:           #0f0f1a;
+  --background:           #f4f8f6;
+  --foreground:           #0f1a17;
   --card:                 #ffffff;
-  --card-foreground:      #0f0f1a;
+  --card-foreground:      #0f1a17;
   --popover:              #ffffff;
-  --popover-foreground:   #0f0f1a;
-  --primary:              #6366f1;
+  --popover-foreground:   #0f1a17;
+  --primary:              #10b981;
   --primary-foreground:   #ffffff;
-  --secondary:            #ededf5;
-  --secondary-foreground: #0f0f1a;
-  --muted:                #ededf5;
+  --secondary:            #edf5f1;
+  --secondary-foreground: #0f1a17;
+  --muted:                #edf5f1;
   --muted-foreground:     #475569;
-  --accent:               #ede9fe;
-  --accent-foreground:    #4c1d95;
+  --accent:               #ecfdf5;
+  --accent-foreground:    #064e3b;
   --destructive:          #f43f5e;
   --destructive-foreground: #ffffff;
-  --border:               #e2e2ee;
-  --input:                #e2e2ee;
-  --ring:                 #6366f1;
+  --border:               #e2eee8;
+  --input:                #e2eee8;
+  --ring:                 #10b981;
 
   /* Extended brand palette */
-  --indigo:               #6366f1;
-  --indigo-soft:          #818cf8;
-  --indigo-dim:           rgba(99,102,241,0.10);
-  --indigo-glow:          rgba(99,102,241,0.18);
-  --violet:               #7c3aed;
+  --emerald:              #10b981;
+  --emerald-soft:         #34d399;
+  --emerald-dim:          rgba(16,185,129,0.10);
+  --emerald-glow:         rgba(16,185,129,0.18);
+  --teal:                 #0d9488;
   --gold:                 #f59e0b;
   --gold-dim:             rgba(245,158,11,0.10);
-  --emerald:              #10b981;
-  --emerald-dim:          rgba(16,185,129,0.10);
   --rose:                 #f43f5e;
   --rose-dim:             rgba(244,63,94,0.10);
   --amber:                #f97316;
   --amber-dim:            rgba(249,115,22,0.10);
   --surface:              #ffffff;
-  --surface2:             #f4f4f8;
-  --surface3:             #ededf5;
+  --surface2:             #f4f8f6;
+  --surface3:             #edf5f1;
   --border-hi:            rgba(0,0,0,0.10);
-  --grid:                 rgba(15,15,26,0.055);
+  --grid:                 rgba(15,26,23,0.055);
 }
 
 /* ── DARK MODE ──────────────────────────────────────── */
 .dark {
-  --background:           #080810;
-  --foreground:           #f8fafc;
-  --card:                 #10101c;
-  --card-foreground:      #f8fafc;
-  --popover:              #16162a;
-  --popover-foreground:   #f8fafc;
-  --primary:              #6366f1;
+  --background:           #060d0b;
+  --foreground:           #f8fcfa;
+  --card:                 #0d1512;
+  --card-foreground:      #f8fcfa;
+  --popover:              #132a23;
+  --popover-foreground:   #f8fcfa;
+  --primary:              #10b981;
   --primary-foreground:   #ffffff;
-  --secondary:            #16162a;
-  --secondary-foreground: #f8fafc;
-  --muted:                #16162a;
-  --muted-foreground:     #a8b8cc;
-  --accent:               #1c1c32;
-  --accent-foreground:    #f1f5f9;
+  --secondary:            #132a23;
+  --secondary-foreground: #f8fcfa;
+  --muted:                #132a23;
+  --muted-foreground:     #a8ccbe;
+  --accent:               #0a1f1a;
+  --accent-foreground:    #f1f9f5;
   --destructive:          #f43f5e;
   --destructive-foreground: #ffffff;
   --border:               rgba(255,255,255,0.07);
-  --input:                #16162a;
-  --ring:                 #6366f1;
+  --input:                #132a23;
+  --ring:                 #10b981;
 
   /* Extended brand palette — same hues, adjusted glows for dark */
-  --indigo:               #6366f1;
-  --indigo-soft:          #818cf8;
-  --indigo-dim:           rgba(99,102,241,0.14);
-  --indigo-glow:          rgba(99,102,241,0.22);
-  --violet:               #7c3aed;
+  --emerald:              #10b981;
+  --emerald-soft:         #34d399;
+  --emerald-dim:          rgba(16,185,129,0.14);
+  --emerald-glow:         rgba(16,185,129,0.22);
+  --teal:                 #0d9488;
   --gold:                 #f59e0b;
   --gold-dim:             rgba(245,158,11,0.12);
-  --emerald:              #10b981;
-  --emerald-dim:          rgba(16,185,129,0.12);
   --rose:                 #f43f5e;
   --rose-dim:             rgba(244,63,94,0.12);
   --amber:                #f97316;
   --amber-dim:            rgba(249,115,22,0.12);
-  --surface:              #10101c;
-  --surface2:             #16162a;
-  --surface3:             #1c1c32;
+  --surface:              #0d1512;
+  --surface2:             #132a23;
+  --surface3:             #0a1f1a;
   --border-hi:            rgba(255,255,255,0.12);
   --grid:                 rgba(255,255,255,0.045);
 }
@@ -149,16 +145,16 @@ body {
 /* ── Aurora ambient glow ───────────────────────────── */
 .aurora {
   background:
-    radial-gradient(1200px 500px at 10% -10%, rgba(99,102,241,0.14), transparent 60%),
-    radial-gradient( 900px 400px at 90%  0%, rgba(124,58,237,0.11), transparent 60%),
-    radial-gradient( 700px 500px at 50% 110%, rgba(16,185,129,0.06), transparent 60%);
+    radial-gradient(1200px 500px at 10% -10%, rgba(16,185,129,0.14), transparent 60%),
+    radial-gradient( 900px 400px at 90%  0%, rgba(13,148,136,0.11), transparent 60%),
+    radial-gradient( 700px 500px at 50% 110%, rgba(52,211,153,0.06), transparent 60%);
 }
 
 .dark .aurora {
   background:
-    radial-gradient(1200px 500px at 10% -10%, rgba(99,102,241,0.22), transparent 60%),
-    radial-gradient( 900px 400px at 90%  0%, rgba(124,58,237,0.18), transparent 60%),
-    radial-gradient( 700px 500px at 50% 110%, rgba(16,185,129,0.10), transparent 60%);
+    radial-gradient(1200px 500px at 10% -10%, rgba(16,185,129,0.22), transparent 60%),
+    radial-gradient( 900px 400px at 90%  0%, rgba(13,148,136,0.18), transparent 60%),
+    radial-gradient( 700px 500px at 50% 110%, rgba(52,211,153,0.10), transparent 60%);
 }
 
 /* ── Bar rise animation ────────────────────────────── */
@@ -217,12 +213,12 @@ body {
   background-image:
     radial-gradient(
       700px circle at var(--bg-x) var(--bg-y),
-      rgba(99, 102, 241, 0.11),
+      rgba(16, 185, 129, 0.11),
       transparent 42%
     ),
     radial-gradient(
       520px circle at calc(100% - var(--bg-x)) calc(100% - var(--bg-y)),
-      rgba(124, 58, 237, 0.09),
+      rgba(13, 148, 136, 0.09),
       transparent 48%
     );
 }
@@ -231,12 +227,12 @@ body {
   background-image:
     radial-gradient(
       700px circle at var(--bg-x) var(--bg-y),
-      rgba(129, 140, 248, 0.14),
+      rgba(52, 211, 153, 0.14),
       transparent 42%
     ),
     radial-gradient(
       520px circle at calc(100% - var(--bg-x)) calc(100% - var(--bg-y)),
-      rgba(167, 139, 250, 0.1),
+      rgba(45, 212, 191, 0.1),
       transparent 48%
     );
 }
@@ -251,12 +247,12 @@ body {
   background-image:
     radial-gradient(
       520px circle at 30% 20%,
-      rgba(99, 102, 241, 0.06),
+      rgba(16, 185, 129, 0.06),
       transparent 50%
     ),
     radial-gradient(
       480px circle at 80% 80%,
-      rgba(124, 58, 237, 0.05),
+      rgba(13, 148, 136, 0.05),
       transparent 50%
     );
 }
@@ -266,12 +262,12 @@ body {
   background-image:
     radial-gradient(
       520px circle at 30% 20%,
-      rgba(129, 140, 248, 0.08),
+      rgba(52, 211, 153, 0.08),
       transparent 50%
     ),
     radial-gradient(
       480px circle at 80% 80%,
-      rgba(167, 139, 250, 0.06),
+      rgba(45, 212, 191, 0.06),
       transparent 50%
     );
 }
@@ -286,7 +282,7 @@ body {
   background:
     radial-gradient(
       420px circle at var(--bg-x) var(--bg-y),
-      rgba(99, 102, 241, 0.25),
+      rgba(16, 185, 129, 0.25),
       transparent 52%
     ),
     radial-gradient(
@@ -296,7 +292,7 @@ body {
     ),
     radial-gradient(
       360px circle at calc(100% - var(--bg-x)) calc(100% - var(--bg-y)),
-      rgba(124, 58, 237, 0.18),
+      rgba(13, 148, 136, 0.18),
       transparent 55%
     );
   mix-blend-mode: soft-light;
@@ -307,7 +303,7 @@ body {
   background:
     radial-gradient(
       420px circle at var(--bg-x) var(--bg-y),
-      rgba(129, 140, 248, 0.28),
+      rgba(52, 211, 153, 0.28),
       transparent 52%
     ),
     radial-gradient(
@@ -317,7 +313,7 @@ body {
     ),
     radial-gradient(
       360px circle at calc(100% - var(--bg-x)) calc(100% - var(--bg-y)),
-      rgba(167, 139, 250, 0.2),
+      rgba(45, 212, 191, 0.2),
       transparent 55%
     );
   mix-blend-mode: screen;
@@ -328,12 +324,12 @@ body {
   background:
     radial-gradient(
       500px circle at 35% 15%,
-      rgba(99, 102, 241, 0.18),
+      rgba(16, 185, 129, 0.18),
       transparent 55%
     ),
     radial-gradient(
       400px circle at 85% 90%,
-      rgba(124, 58, 237, 0.12),
+      rgba(13, 148, 136, 0.12),
       transparent 50%
     );
 }
@@ -343,12 +339,12 @@ body {
   background:
     radial-gradient(
       500px circle at 35% 15%,
-      rgba(129, 140, 248, 0.2),
+      rgba(52, 211, 153, 0.2),
       transparent 55%
     ),
     radial-gradient(
       400px circle at 85% 90%,
-      rgba(167, 139, 250, 0.14),
+      rgba(45, 212, 191, 0.14),
       transparent 50%
     );
 }

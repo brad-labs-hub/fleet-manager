@@ -51,11 +51,11 @@ function LoginForm() {
 
         {/* Brand */}
         <div className="text-center mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg ring-1 ring-black/5 dark:ring-white/10">
             <span className="text-white font-bold font-syne text-base tracking-tight">FM</span>
           </div>
           <h1 className="text-2xl font-extrabold font-syne tracking-tight leading-none">
-            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">Fleet</span>
+            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Fleet</span>
             <span className="text-foreground ml-1.5">Manager</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-2">Sign in to your account</p>
@@ -114,7 +114,7 @@ function LoginForm() {
             type="submit"
             disabled={loading}
             className="w-full py-2.5 rounded-xl font-medium text-sm cursor-pointer transition-opacity duration-200 hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
-            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)", color: "#fff" }}
+            style={{ background: "linear-gradient(135deg, var(--emerald) 0%, var(--teal) 100%)", color: "#fff" }}
           >
             {loading ? "Signing in…" : "Sign In"}
           </button>

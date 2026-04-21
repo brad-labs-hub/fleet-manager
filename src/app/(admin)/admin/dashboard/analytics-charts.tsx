@@ -12,8 +12,8 @@ type MonthlyData = { month: string; total: number };
 type VehicleData = { name: string; total: number };
 
 const PIE_COLORS = [
-  "#6366f1", "#22c55e", "#f59e0b", "#ef4444",
-  "#14b8a6", "#8b5cf6", "#ec4899", "#f97316",
+  "#10b981", "#22c55e", "#f59e0b", "#ef4444",
+  "#14b8a6", "#0d9488", "#ec4899", "#f97316",
 ];
 
 function formatCategory(cat: string) {
@@ -180,7 +180,7 @@ export function MonthlySpendChart({ data }: { data: MonthlyData[] }) {
         <Tooltip formatter={(value) => formatCurrency(Number(value))} />
         <Bar
           dataKey="total"
-          fill="#6366f1"
+          fill="#10b981"
           radius={[4, 4, 0, 0]}
           isAnimationActive={!reducedMotion}
           animationDuration={reducedMotion ? 0 : 450}

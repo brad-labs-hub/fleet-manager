@@ -200,11 +200,11 @@ function HeroHeader() {
 function Logo({ className }: { className?: string }) {
   return (
     <span className={cn("flex items-center gap-2", className)}>
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 font-syne text-[10px] font-bold tracking-wide text-white shadow-sm">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 font-syne text-[10px] font-bold tracking-wide text-white shadow-sm">
         FM
       </span>
       <span className="font-syne text-sm font-bold leading-none text-foreground">
-        <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
           Fleet
         </span>
         <span className="text-foreground"> Manager</span>

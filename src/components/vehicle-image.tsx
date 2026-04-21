@@ -138,7 +138,7 @@ export function VehicleImage({ make, model, year, color, imageUrl, className = "
       .join("");
     const bgColor = colorToCss(color);
     // Choose white or dark text based on lightness of background
-    const isDark = ["#1a1a1a", "#6b7280", "#2563eb", "#16a34a", "#92400e", "#7c3aed", "#0d9488", "#4b5563", "#dc2626"].includes(bgColor);
+    const isDark = ["#1a1a1a", "#6b7280", "#2563eb", "#16a34a", "#92400e", "#0d9488", "#4b5563", "#dc2626"].includes(bgColor);
     return (
       <div
         className={`flex items-center justify-center rounded font-bold text-sm select-none ${className}`}

@@ -8,8 +8,8 @@ type SparklineProps = {
 
 export function Sparkline({
   data,
-  stroke = "var(--indigo-soft)",
-  fill = "rgba(99,102,241,0.18)",
+  stroke = "var(--emerald-soft)",
+  fill = "rgba(16,185,129,0.18)",
   height = 40,
   className = "",
 }: SparklineProps) {

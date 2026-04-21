@@ -20,17 +20,17 @@ function receiptDayKey(dateStr: string | null | undefined): string {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  gas: "#6366f1",
-  fuel: "#6366f1",
-  maintenance: "#7c3aed",
+  gas: "#10b981",
+  fuel: "#10b981",
+  maintenance: "#0d9488",
   insurance: "#f59e0b",
-  tires: "#10b981",
+  tires: "#34d399",
   registration: "#f43f5e",
   detailing: "#f97316",
   car_wash: "#f97316",
-  parking: "#818cf8",
-  tolls: "#818cf8",
-  other: "#818cf8",
+  parking: "#6ee7b7",
+  tolls: "#6ee7b7",
+  other: "#6ee7b7",
 };
 
 export default async function AdminDashboardPage() {
@@ -124,7 +124,7 @@ export default async function AdminDashboardPage() {
     .map(([category, total]) => ({
       category,
       total,
-      color: CATEGORY_COLORS[category] ?? "#818cf8",
+      color: CATEGORY_COLORS[category] ?? "#6ee7b7",
     }))
     .sort((a, b) => b.total - a.total);
 
@@ -263,9 +263,9 @@ export default async function AdminDashboardPage() {
           </Link>
           <Link
             href="/admin/vehicles/new"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-white text-sm font-medium transition-shadow duration-200 shadow-indigo-sm hover:shadow-indigo"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-white text-sm font-medium transition-shadow duration-200 shadow-emerald-sm hover:shadow-emerald"
             style={{
-              background: "linear-gradient(135deg,#6366f1,#7c3aed)",
+              background: "linear-gradient(135deg,#10b981,#0d9488)",
             }}
           >
             <Plus className="h-3.5 w-3.5" />
@@ -281,7 +281,7 @@ export default async function AdminDashboardPage() {
             title: "Fleet size",
             value: String(vehicles.length),
             sub: `${vehicles.length} in fleet`,
-            accent: "var(--indigo-soft)",
+            accent: "var(--emerald-soft)",
             icon: <Car className="h-4 w-4" />,
             spark: monthlyTotals.length > 1 ? monthlyTotals : [1, 1],
           },
@@ -289,7 +289,7 @@ export default async function AdminDashboardPage() {
             title: "Spend YTD",
             value: formatCurrency(totalReceipts),
             sub: "Year to date",
-            accent: "var(--indigo-soft)",
+            accent: "var(--emerald-soft)",
             icon: <TrendingUp className="h-4 w-4" />,
             spark: monthlyTotals.length > 1 ? monthlyTotals : [1, 1],
           },
@@ -325,7 +325,7 @@ export default async function AdminDashboardPage() {
                 <div
                   className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center"
                   style={{
-                    background: "var(--indigo-dim)",
+                    background: "var(--emerald-dim)",
                     color: k.accent,
                   }}
                 >
@@ -335,7 +335,7 @@ export default async function AdminDashboardPage() {
                   <Sparkline
                     data={k.spark}
                     stroke={k.accent}
-                    fill="rgba(99,102,241,0.14)"
+                    fill="rgba(16,185,129,0.14)"
                     height={28}
                     className="w-full h-full"
                   />
@@ -359,8 +359,8 @@ export default async function AdminDashboardPage() {
                 <div
                   className="h-6 w-6 rounded-lg flex items-center justify-center"
                   style={{
-                    background: "var(--indigo-dim)",
-                    color: "var(--indigo-soft)",
+                    background: "var(--emerald-dim)",
+                    color: "var(--emerald-soft)",
                   }}
                 >
                   <Car className="h-3.5 w-3.5" aria-hidden />
@@ -373,7 +373,7 @@ export default async function AdminDashboardPage() {
             </div>
             <Link
               href="/admin/vehicles"
-              className="text-[11px] font-medium flex items-center gap-1 text-[var(--indigo-soft)] hover:underline"
+              className="text-[11px] font-medium flex items-center gap-1 text-[var(--emerald-soft)] hover:underline"
             >
               All <ArrowRight className="h-3 w-3" />
             </Link>
@@ -390,11 +390,11 @@ export default async function AdminDashboardPage() {
                     <li key={v.id}>
                       <Link
                         href={`/admin/vehicles/${v.id}`}
-                        className="flex items-center gap-3 rounded-xl border border-border/80 bg-muted/40 hover:border-[rgba(99,102,241,0.35)] hover:bg-accent px-3 py-2.5 transition-colors duration-200"
+                        className="flex items-center gap-3 rounded-xl border border-border/80 bg-muted/40 hover:border-[rgba(16,185,129,0.35)] hover:bg-accent px-3 py-2.5 transition-colors duration-200"
                       >
-                        <div className="h-9 w-9 shrink-0 rounded-lg flex items-center justify-center bg-[var(--indigo-dim)]">
+                        <div className="h-9 w-9 shrink-0 rounded-lg flex items-center justify-center bg-[var(--emerald-dim)]">
                           <Car
-                            className="h-4 w-4 text-[var(--indigo-soft)]"
+                            className="h-4 w-4 text-[var(--emerald-soft)]"
                             aria-hidden
                           />
                         </div>
@@ -423,7 +423,7 @@ export default async function AdminDashboardPage() {
                 </p>
                 <Link
                   href="/admin/vehicles/new"
-                  className="mt-3 text-xs font-medium text-[var(--indigo-soft)] hover:underline"
+                  className="mt-3 text-xs font-medium text-[var(--emerald-soft)] hover:underline"
                 >
                   Add your first vehicle &rarr;
                 </Link>
@@ -512,8 +512,8 @@ export default async function AdminDashboardPage() {
               </div>
               <Link
                 href="/admin/receipts"
-                className="text-[11px] font-medium flex items-center gap-1 text-[var(--indigo-soft)] hover:underline"
-              >
+                className="text-[11px] font-medium flex items-center gap-1 text-[var(--emerald-soft)] hover:underline"
+            >
                 All <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -555,7 +555,7 @@ export default async function AdminDashboardPage() {
                 </p>
                 <Link
                   href="/admin/receipts/new"
-                  className="text-xs font-medium text-[var(--indigo-soft)] hover:underline"
+                  className="text-xs font-medium text-[var(--emerald-soft)] hover:underline"
                 >
                   Add the first one &rarr;
                 </Link>
@@ -612,7 +612,7 @@ export default async function AdminDashboardPage() {
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
             <Link
               href="/admin/expiring-soon"
-              className="text-[11px] font-medium text-[var(--indigo-soft)] hover:underline"
+              className="text-[11px] font-medium text-[var(--emerald-soft)] hover:underline"
             >
               See all
             </Link>
@@ -626,7 +626,7 @@ export default async function AdminDashboardPage() {
                     ? "#f43f5e"
                     : a.severity === "warn"
                       ? "#f59e0b"
-                      : "#818cf8";
+                      : "#6ee7b7";
                 return (
                   <li
                     key={i}

@@ -46,7 +46,7 @@ export default async function DriverLayout({
             href="/driver/dashboard"
             className="flex items-center gap-2.5 cursor-pointer rounded-xl outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-indigo-sm shrink-0">
+            <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-emerald-sm shrink-0">
               <span className="text-white text-[10px] font-bold tracking-wide">FM</span>
             </div>
             <span className="font-semibold text-foreground text-sm">Fleet Manager</span>

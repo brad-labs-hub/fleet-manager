@@ -46,7 +46,7 @@ export function AdminNav({ role }: Props) {
               href={href}
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 active
-                  ? "bg-[var(--indigo-dim)] text-[var(--indigo-soft)] border border-[rgba(99,102,241,0.22)]"
+                  ? "bg-[var(--emerald-dim)] text-[var(--emerald-soft)] border border-[rgba(16,185,129,0.22)]"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent"
               }`}
             >
@@ -62,7 +62,7 @@ export function AdminNav({ role }: Props) {
               size="sm"
               className={`flex items-center gap-2 px-3 py-2 h-auto rounded-xl text-sm font-medium whitespace-nowrap cursor-pointer transition-colors duration-200 ${
                 toolsActive
-                  ? "bg-[var(--indigo-dim)] text-[var(--indigo-soft)] border border-[rgba(99,102,241,0.22)]"
+                  ? "bg-[var(--emerald-dim)] text-[var(--emerald-soft)] border border-[rgba(16,185,129,0.22)]"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent"
               }`}
             >
@@ -86,7 +86,7 @@ export function AdminNav({ role }: Props) {
             href="/admin/users"
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap cursor-pointer transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
               pathname === "/admin/users"
-                ? "bg-[var(--indigo-dim)] text-[var(--indigo-soft)] border border-[rgba(99,102,241,0.22)]"
+                ? "bg-[var(--emerald-dim)] text-[var(--emerald-soft)] border border-[rgba(16,185,129,0.22)]"
                 : "text-muted-foreground hover:text-foreground hover:bg-accent"
             }`}
           >
