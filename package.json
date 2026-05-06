@@ -13,7 +13,10 @@
     "ci": "npm run lint && npm run typecheck && npm run test",
     "db:push": "npx supabase db push",
     "db:status": "npx supabase migration list",
-    "db:repair-applied": "npx supabase migration repair 20240302000001 --status applied && npx supabase migration repair 20240302000002 --status applied && npx supabase migration repair 20240302000003 --status applied && npx supabase migration repair 20240302000004 --status applied && npx supabase migration repair 20260302000005 --status applied && npx supabase migration repair 20260302100000 --status applied && npx supabase migration repair 20260303000001 --status applied"
+    "db:repair-applied": "npx supabase migration repair 20240302000001 --status applied && npx supabase migration repair 20240302000002 --status applied && npx supabase migration repair 20240302000003 --status applied && npx supabase migration repair 20240302000004 --status applied && npx supabase migration repair 20260302000005 --status applied && npx supabase migration repair 20260302100000 --status applied && npx supabase migration repair 20260303000001 --status applied",
+    "security:print-rotation-inventory": "node scripts/print-rotation-inventory.mjs",
+    "security:vercel-audit-env": "node scripts/vercel-audit-env.mjs",
+    "security:rotate-supabase-api-keys": "node scripts/supabase-rotate-api-keys.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
