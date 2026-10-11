@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RECEIPT_CATEGORIES, type ReceiptCategory } from "@/types/database";
-import { Upload, FileText, X, Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
+import { ReceiptDocumentPicker } from "@/components/receipts/receipt-document-picker";
+import {
+  insertReceiptAttachmentRows,
+  uploadReceiptDocument,
+} from "@/lib/receipt-documents";
 
 type AiFields = Set<"category" | "amount" | "date" | "vendor" | "notes">;
 
@@ -29,7 +35,7 @@ export default function NewReceiptPage() {
   const [notes, setNotes] = useState("");
   const [vehicleId, setVehicleId] = useState<string>("");
   const [locationId, setLocationId] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [vehicles, setVehicles] = useState<{ id: string; make: string; model: string; year: number }[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +43,6 @@ export default function NewReceiptPage() {
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [aiFields, setAiFields] = useState<AiFields>(new Set());
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -54,12 +59,9 @@ export default function NewReceiptPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function handleFileChange(selected: File | null) {
-    setFile(selected);
+  async function scanFirstFile(selected: File) {
     setAiFields(new Set());
     setScanError(null);
-    if (!selected) return;
-
     setScanning(true);
     try {
       const fd = new FormData();
@@ -85,6 +87,18 @@ export default function NewReceiptPage() {
     }
   }
 
+  function handleFilesChange(next: File[]) {
+    const hadFiles = files.length > 0;
+    setFiles(next);
+    if (!hadFiles && next.length > 0) {
+      void scanFirstFile(next[0]);
+    }
+    if (next.length === 0) {
+      setAiFields(new Set());
+      setScanError(null);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -94,29 +108,32 @@ export default function NewReceiptPage() {
       if (!user) throw new Error("Not authenticated");
 
       let documentUrl: string | null = null;
-      if (file) {
-        const ext = file.name.split(".").pop() ?? "pdf";
-        const path = `receipts/${crypto.randomUUID()}-${Date.now()}.${ext}`;
-        const { error: uploadError } = await supabase.storage
-          .from("receipts")
-          .upload(path, file, { upsert: true });
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(path);
-        documentUrl = urlData.publicUrl;
+      const extraUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadReceiptDocument(supabase, files[i], "receipts");
+        if (i === 0) documentUrl = url;
+        else extraUrls.push(url);
       }
 
-      const { error } = await supabase.from("receipts").insert({
-        category,
-        amount: parseFloat(amount),
-        date,
-        vendor: vendor || null,
-        notes: notes || null,
-        vehicle_id: vehicleId || null,
-        location_id: locationId || null,
-        document_url: documentUrl,
-        created_by: user.id,
-      });
+      const { data: inserted, error } = await supabase
+        .from("receipts")
+        .insert({
+          category,
+          amount: parseFloat(amount),
+          date,
+          vendor: vendor || null,
+          notes: notes || null,
+          vehicle_id: vehicleId || null,
+          location_id: locationId || null,
+          document_url: documentUrl,
+          created_by: user.id,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
+      if (inserted?.id && extraUrls.length > 0) {
+        await insertReceiptAttachmentRows(supabase, inserted.id, extraUrls);
+      }
       router.push("/driver/dashboard");
       router.refresh();
     } catch (err: unknown) {
@@ -135,62 +152,31 @@ export default function NewReceiptPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Image upload — prominent button */}
-            <div className="space-y-2">
-              <Label className="text-foreground">Receipt image or document</Label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-                className="hidden"
-              />
-              {!file ? (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full flex flex-col items-center justify-center gap-2 py-10 px-4 rounded-xl border-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary transition-colors text-foreground"
-                >
-                  <Upload className="w-10 h-10 text-primary" />
-                  <span className="font-medium">Click to upload receipt</span>
-                  <span className="text-sm text-muted-foreground">PDF, JPG or PNG — fields auto-filled by AI</span>
-                </button>
-              ) : (
-                <div className="flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/30">
-                  {scanning ? (
-                    <Loader2 className="w-8 h-8 text-teal-500 shrink-0 animate-spin" />
-                  ) : (
-                    <FileText className="w-8 h-8 text-primary shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <span className="block truncate text-sm text-foreground font-medium">{file.name}</span>
-                    {scanning && (
-                      <span className="text-xs text-teal-500 flex items-center gap-1 mt-0.5">
-                        <Sparkles className="w-3 h-3" /> Reading receipt…
-                      </span>
-                    )}
-                    {!scanning && scanError && (
-                      <span className="text-xs text-muted-foreground mt-0.5">{scanError}</span>
-                    )}
-                    {!scanning && aiFields.size > 0 && (
-                      <span className="text-xs text-teal-500 flex items-center gap-1 mt-0.5">
-                        <Sparkles className="w-3 h-3" /> {aiFields.size} field{aiFields.size !== 1 ? "s" : ""} filled by AI — review below
-                      </span>
-                    )}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleFileChange(null)}
-                    className="shrink-0"
-                    aria-label="Remove file"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
+            <ReceiptDocumentPicker
+              label="Receipt image or document"
+              hint="First file is scanned by AI. You can attach more pages or receipts."
+              files={files}
+              onFilesChange={handleFilesChange}
+            />
+            {(scanning || scanError || aiFields.size > 0) && files.length > 0 && (
+              <div className="text-sm flex items-center gap-2 -mt-2">
+                {scanning && (
+                  <>
+                    <Loader2 className="w-4 h-4 text-teal-500 animate-spin shrink-0" />
+                    <span className="text-teal-500">Reading first file…</span>
+                  </>
+                )}
+                {!scanning && scanError && (
+                  <span className="text-muted-foreground">{scanError}</span>
+                )}
+                {!scanning && aiFields.size > 0 && (
+                  <span className="text-teal-500 flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {aiFields.size} field{aiFields.size !== 1 ? "s" : ""} filled from first file
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Tag to vehicle or location */}
             <div className="space-y-2">
@@ -274,9 +260,8 @@ export default function NewReceiptPage() {
               <Label htmlFor="date">
                 Date{aiFields.has("date") && <AiBadge />}
               </Label>
-              <Input
+              <DateInput
                 id="date"
-                type="date"
                 value={date}
                 onChange={(e) => {
                   setDate(e.target.value);

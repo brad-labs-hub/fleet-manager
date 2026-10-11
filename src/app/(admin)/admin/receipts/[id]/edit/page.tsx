@@ -6,10 +6,15 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RECEIPT_CATEGORIES, type ReceiptCategory } from "@/types/database";
-import { getSecureDocumentHref } from "@/lib/document-links";
+import { ReceiptDocumentPicker } from "@/components/receipts/receipt-document-picker";
+import {
+  insertReceiptAttachmentRows,
+  uploadReceiptDocument,
+} from "@/lib/receipt-documents";
 
 export default function EditReceiptPage() {
   const params = useParams();
@@ -21,7 +26,8 @@ export default function EditReceiptPage() {
   const [notes, setNotes] = useState("");
   const [vehicleId, setVehicleId] = useState("");
   const [locationId, setLocationId] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [attachmentUrls, setAttachmentUrls] = useState<string[]>([]);
   const [vehicles, setVehicles] = useState<{ id: string; make: string; model: string; year: number }[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,10 +39,11 @@ export default function EditReceiptPage() {
 
   useEffect(() => {
     async function load() {
-      const [vRes, lRes, rRes] = await Promise.all([
+      const [vRes, lRes, rRes, aRes] = await Promise.all([
         supabase.from("vehicles").select("id, make, model, year").order("make"),
         supabase.from("locations").select("id, name").order("name"),
         supabase.from("receipts").select("*").eq("id", id).single(),
+        supabase.from("receipt_attachments").select("document_url").eq("receipt_id", id),
       ]);
       setVehicles(vRes.data ?? []);
       setLocations(lRes.data ?? []);
@@ -51,6 +58,9 @@ export default function EditReceiptPage() {
         setLocationId(r.location_id ?? "");
         setDocumentUrl(r.document_url ?? null);
       }
+      if (!aRes.error && aRes.data) {
+        setAttachmentUrls(aRes.data.map((a) => a.document_url));
+      }
       setLoadingData(false);
     }
     load();
@@ -62,15 +72,14 @@ export default function EditReceiptPage() {
     setLoading(true);
     try {
       let finalDocumentUrl = documentUrl;
-      if (file) {
-        const ext = file.name.split(".").pop() ?? "pdf";
-        const path = `receipts/${id}-${Date.now()}.${ext}`;
-        const { error: uploadError } = await supabase.storage
-          .from("receipts")
-          .upload(path, file, { upsert: true });
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(path);
-        finalDocumentUrl = urlData.publicUrl;
+      const uploadedExtra: string[] = [];
+      for (let i = 0; i < newFiles.length; i++) {
+        const url = await uploadReceiptDocument(supabase, newFiles[i], `receipts/${id}`);
+        if (!finalDocumentUrl && i === 0) finalDocumentUrl = url;
+        else uploadedExtra.push(url);
+      }
+      if (uploadedExtra.length > 0) {
+        await insertReceiptAttachmentRows(supabase, id, uploadedExtra);
       }
       const { error } = await supabase
         .from("receipts")
@@ -133,7 +142,7 @@ export default function EditReceiptPage() {
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="amount">Amount ($)</Label>
                 <Input
@@ -144,13 +153,13 @@ export default function EditReceiptPage() {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
+                  className="min-h-11"
                 />
               </div>
               <div>
                 <Label htmlFor="date">Date</Label>
-                <Input
+                <DateInput
                   id="date"
-                  type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
@@ -166,7 +175,7 @@ export default function EditReceiptPage() {
                 placeholder="e.g. Shell, Mobil"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="vehicle">Vehicle (optional)</Label>
                 <select
@@ -200,23 +209,14 @@ export default function EditReceiptPage() {
                 </select>
               </div>
             </div>
-            <div>
-              <Label htmlFor="file">Document (optional — replace existing)</Label>
-              <Input
-                id="file"
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="mt-1"
-              />
-              {documentUrl && !file && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  <a href={getSecureDocumentHref(documentUrl)} className="underline">
-                    View current document
-                  </a>
-                </p>
-              )}
-            </div>
+            <ReceiptDocumentPicker
+              label="Documents (optional)"
+              hint="Add one or more files. Existing documents stay unless you upload a first file where none exists."
+              files={newFiles}
+              onFilesChange={setNewFiles}
+              existingUrls={[documentUrl, ...attachmentUrls].filter((u): u is string => Boolean(u))}
+              variant="compact"
+            />
             <div>
               <Label htmlFor="notes">Notes</Label>
               <Input

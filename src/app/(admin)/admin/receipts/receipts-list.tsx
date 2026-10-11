@@ -8,6 +8,7 @@ import { ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { getSecureDocumentHref } from "@/lib/document-links";
@@ -169,9 +170,8 @@ export function ReceiptsList({
             </div>
             <div>
               <Label htmlFor="filter-from" className="text-xs text-muted-foreground">Date from</Label>
-              <Input
+              <DateInput
                 id="filter-from"
-                type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
                 className="mt-1"
@@ -179,9 +179,8 @@ export function ReceiptsList({
             </div>
             <div>
               <Label htmlFor="filter-to" className="text-xs text-muted-foreground">Date to</Label>
-              <Input
+              <DateInput
                 id="filter-to"
-                type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
                 className="mt-1"

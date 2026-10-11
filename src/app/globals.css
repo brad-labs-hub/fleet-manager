@@ -108,6 +108,9 @@ body {
 }
 
 @layer utilities {
+  .safe-area-pb {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
   .text-balance { text-wrap: balance; }
   .font-syne    { font-family: 'Plus Jakarta Sans', sans-serif; }
 
@@ -174,6 +177,15 @@ body {
 }
 .pulse-dot {
   animation: pulseDot 1.8s ease-in-out infinite;
+}
+
+/* Native date inputs on mobile (picker visibility / dark mode) */
+input[type="date"].date-input-mobile {
+  min-height: 2.75rem;
+  color-scheme: light;
+}
+.dark input[type="date"].date-input-mobile {
+  color-scheme: dark;
 }
 
 @media (prefers-reduced-motion: reduce) {
