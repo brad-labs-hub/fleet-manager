@@ -15,7 +15,9 @@ export async function GET(request: NextRequest) {
   authUrl.searchParams.set("client_id", clientId);
   authUrl.searchParams.set("redirect_uri", redirectUri);
   authUrl.searchParams.set("response_type", "code");
-  authUrl.searchParams.set("scope", "https://www.googleapis.com/auth/drive.readonly");
+  // drive.file grants access only to files the user opens/creates with this
+  // app, instead of the broad read-everything drive.readonly scope.
+  authUrl.searchParams.set("scope", "https://www.googleapis.com/auth/drive.file");
   authUrl.searchParams.set("state", state);
 
   const response = NextResponse.redirect(authUrl);

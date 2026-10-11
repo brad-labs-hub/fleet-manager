@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
+import { requireRole } from "@/lib/auth-guard";
 
 export async function POST(request: NextRequest) {
+  const guard = await requireRole(["employee", "controller"]);
+  if (!guard.ok) return guard.response;
+
   try {
     const body = await request.json();
     const {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { encryptToken } from "@/lib/oauth-tokens";
 
 const ONEDRIVE_STATE_COOKIE = "oauth_onedrive_state";
 const ONEDRIVE_ACCESS_COOKIE = "oauth_onedrive_access_token";
@@ -65,15 +66,22 @@ export async function GET(request: NextRequest) {
   );
   response.cookies.delete(ONEDRIVE_STATE_COOKIE);
   if (typeof tokens.access_token === "string" && tokens.access_token.length > 0) {
-    response.cookies.set({
-      name: ONEDRIVE_ACCESS_COOKIE,
-      value: tokens.access_token,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 30,
-    });
+    const encrypted = encryptToken(tokens.access_token);
+    if (encrypted) {
+      response.cookies.set({
+        name: ONEDRIVE_ACCESS_COOKIE,
+        value: encrypted,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 30,
+      });
+    } else {
+      console.error(
+        "OAUTH_TOKEN_ENCRYPTION_KEY not configured — refusing to store OneDrive access token in plaintext."
+      );
+    }
   }
   return response;
 }

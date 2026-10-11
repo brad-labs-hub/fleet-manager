@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 };
 
 type ViewerPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     documentUrl?: string;
     title?: string;
     backTo?: string;
-  };
+  }>;
 };
 
 function getFileType(documentUrl: string): "pdf" | "image" {
@@ -33,19 +33,20 @@ function getSafeBackTo(backTo: string | undefined): string {
 }
 
 export default async function DocumentViewerPage({ searchParams }: ViewerPageProps) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const documentUrl = searchParams?.documentUrl;
+  const documentUrl = params?.documentUrl;
   if (!documentUrl) redirect("/admin/dashboard");
 
   const title =
-    searchParams?.title ||
+    params?.title ||
     decodeURIComponent(documentUrl.split("/").pop() || "Document");
-  const backTo = getSafeBackTo(searchParams?.backTo);
+  const backTo = getSafeBackTo(params?.backTo);
   const fileType = getFileType(documentUrl);
   const streamUrl = getDocumentStreamHref(documentUrl);
 

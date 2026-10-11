@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireRole } from "@/lib/auth-guard";
 
 export async function POST(request: NextRequest) {
+  const guard = await requireRole(["employee", "controller"]);
+  if (!guard.ok) return guard.response;
+
   try {
     const body = await request.json();
     const {

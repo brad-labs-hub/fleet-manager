@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getDocumentStreamHref } from "@/lib/document-links";
 import { VehicleGrid } from "./vehicle-grid";
 
 export default async function AdminVehiclesPage() {
@@ -44,7 +45,9 @@ export default async function AdminVehiclesPage() {
       ...v,
       location: loc,
       previewUrl: v.preview_image_path
-        ? supabase.storage.from("vehicle-previews").getPublicUrl(v.preview_image_path).data.publicUrl
+        ? getDocumentStreamHref(
+            supabase.storage.from("vehicle-previews").getPublicUrl(v.preview_image_path).data.publicUrl
+          )
         : null,
       nextDueDate: next?.date,
       nextDueLabel: next?.label,

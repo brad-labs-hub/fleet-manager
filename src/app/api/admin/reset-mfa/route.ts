@@ -41,9 +41,11 @@ export async function POST(request: Request) {
   const { data, error: listError } = await admin.auth.admin.mfa.listFactors({ userId });
   if (listError) return NextResponse.json({ error: listError.message }, { status: 500 });
 
+  // Remove ALL factors regardless of type or status. Stale "unverified" factors
+  // (left behind by an incomplete enrollment) otherwise block re-enrollment because
+  // the setup page enrolls with a fixed friendlyName and Supabase rejects duplicates.
   const allFactors = data?.factors ?? [];
-  const totpFactors = allFactors.filter((f) => f.factor_type === "totp" && f.status === "verified");
-  for (const factor of totpFactors) {
+  for (const factor of allFactors) {
     const { error: deleteError } = await admin.auth.admin.mfa.deleteFactor({
       id: factor.id,
       userId,
@@ -54,8 +56,8 @@ export async function POST(request: Request) {
   logApiEvent("info", "/api/admin/reset-mfa", requestId, { ip, status: 200, userId });
   return NextResponse.json({
     success: true,
-    removed: totpFactors.length,
-    message: totpFactors.length > 0
+    removed: allFactors.length,
+    message: allFactors.length > 0
       ? "MFA factors removed. User will need to set up MFA again on next login."
       : "No MFA factors were enrolled.",
     requestId,

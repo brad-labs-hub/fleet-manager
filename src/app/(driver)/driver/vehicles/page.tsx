@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { getDocumentStreamHref } from "@/lib/document-links";
 import { VehicleImage } from "@/components/vehicle-image";
 
 export default async function VehiclesListPage() {
@@ -33,7 +34,9 @@ export default async function VehiclesListPage() {
       <div className="space-y-3">
         {sortedVehicles.map((v) => {
           const previewUrl = v.preview_image_path
-            ? supabase.storage.from("vehicle-previews").getPublicUrl(v.preview_image_path).data.publicUrl
+            ? getDocumentStreamHref(
+                supabase.storage.from("vehicle-previews").getPublicUrl(v.preview_image_path).data.publicUrl
+              )
             : null;
           return (
           <Link key={v.id} href={`/driver/vehicles/${v.id}`}>

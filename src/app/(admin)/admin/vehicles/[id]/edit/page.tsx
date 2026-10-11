@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { getDocumentStreamHref } from "@/lib/document-links";
 
 const supabase = createClient();
 
@@ -234,7 +235,9 @@ export default function EditVehiclePage() {
               {previewImagePath && (
                 <div className="mt-2 flex items-center gap-3">
                   <img
-                    src={supabase.storage.from("vehicle-previews").getPublicUrl(previewImagePath).data.publicUrl}
+                    src={getDocumentStreamHref(
+                      supabase.storage.from("vehicle-previews").getPublicUrl(previewImagePath).data.publicUrl
+                    )}
                     alt="Preview"
                     className="w-24 h-16 rounded object-cover border border-border"
                   />

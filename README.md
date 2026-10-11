@@ -18,6 +18,15 @@ A full-stack fleet management application for high net worth families. Manage ve
 - Next.js 14 (App Router)
 - Supabase (PostgreSQL, Auth, Storage)
 - Tailwind CSS, shadcn/ui
+- **iOS**: Capacitor 8 (hosted WebView → Vercel)
+
+## iOS app
+
+Native shell in `ios/` loads your deployed site. See **[docs/ios.md](docs/ios.md)** for Xcode signing, TestFlight, and local device testing.
+
+```bash
+npm run cap:run   # sync + open Xcode
+```
 
 ## Setup
 

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // pdfjs-dist references the optional Node `canvas` package, which must not be
+  // bundled for the browser. This alias requires the Webpack bundler, so the
+  // dev/build scripts pass `--webpack` to opt out of the Next.js 16 Turbopack
+  // default. Migrating this alias to `turbopack.resolveAlias` is a follow-up.
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),

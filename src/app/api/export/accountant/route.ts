@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PassThrough } from "stream";
 import archiver from "archiver";
 import ExcelJS from "exceljs";
-import { createClient } from "@/lib/supabase/server";
+import { requireRole } from "@/lib/auth-guard";
 
 function sanitizeFilename(str: string): string {
   return str.replace(/[/\\:*?"<>|]/g, "-").trim() || "Receipt";
@@ -50,6 +50,10 @@ function tryExtractReceiptsObjectPath(url: string): string | null {
 }
 
 export async function POST(request: NextRequest) {
+  const guard = await requireRole(["employee", "controller"]);
+  if (!guard.ok) return guard.response;
+  const { supabase } = guard.context;
+
   try {
     const body = await request.json();
     const { startDate, endDate, receiptIds } = body as {
@@ -65,7 +69,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
     let query = supabase
       .from("receipts")
       .select("id, date, category, amount, vendor, notes, document_url, vehicle:vehicles(make, model, year)")
