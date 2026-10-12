@@ -60,7 +60,7 @@ export function ReceiptDocumentPicker({
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
+        accept=".pdf,.jpg,.jpeg,.png,.heic,.heif,.webp,application/pdf,image/*"
         onChange={(e) => {
           addFiles(e.target.files);
           e.target.value = "";

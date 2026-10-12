@@ -15,6 +15,7 @@ import {
   insertReceiptAttachmentRows,
   uploadReceiptDocument,
 } from "@/lib/receipt-documents";
+import { formatErrorMessage } from "@/lib/format-error";
 
 export default function EditReceiptPage() {
   const params = useParams();
@@ -78,10 +79,8 @@ export default function EditReceiptPage() {
         if (!finalDocumentUrl && i === 0) finalDocumentUrl = url;
         else uploadedExtra.push(url);
       }
-      if (uploadedExtra.length > 0) {
-        await insertReceiptAttachmentRows(supabase, id, uploadedExtra);
-      }
-      const { error } = await supabase
+
+      const { error: updateError } = await supabase
         .from("receipts")
         .update({
           category,
@@ -94,11 +93,19 @@ export default function EditReceiptPage() {
           document_url: finalDocumentUrl,
         })
         .eq("id", id);
-      if (error) throw error;
+      if (updateError) throw new Error(updateError.message);
+
+      if (uploadedExtra.length > 0) {
+        await insertReceiptAttachmentRows(id, uploadedExtra);
+      }
+
+      setNewFiles([]);
+      setDocumentUrl(finalDocumentUrl);
+      setAttachmentUrls((prev) => [...prev, ...uploadedExtra]);
       router.push("/admin/receipts");
       router.refresh();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to save");
+      setError(formatErrorMessage(err));
     } finally {
       setLoading(false);
     }

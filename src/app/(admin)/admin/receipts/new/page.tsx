@@ -128,7 +128,7 @@ export default function NewReceiptPage() {
         .single();
       if (error) throw error;
       if (inserted?.id && extraUrls.length > 0) {
-        await insertReceiptAttachmentRows(supabase, inserted.id, extraUrls);
+        await insertReceiptAttachmentRows(inserted.id, extraUrls);
       }
       router.push("/admin/receipts");
       router.refresh();
